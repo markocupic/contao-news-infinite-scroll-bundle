@@ -13,7 +13,7 @@
                 // CSS selector: Default to $(window)
                 scrollContainer: $(window),
                 // CSS selector: Pagination links (<a href="infinite?page_n193=5" class="link page-link" title="Gehe zu Seite 5">5</a>)
-                paginationLinks: '.pagination .link.page-link',
+                paginationLinks: '.pagination .link',
                 // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
                 loadAllOnDomready: false,
                 // Use a "load more button" (Preserve the accessability of the footer)
@@ -21,13 +21,13 @@
                 // Load more button
                 loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container text-center"><button class="btn btn-primary w-100"><?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadMore"] ?></button></div>',
                 // CSS selector: When you scroll and the window has reached the anchor point, requests will start
-                anchorPoint: '.mod_newslist_contao_infinite_scroll',
+                anchorPoint: '.mod_newslist_infinite_scroll',
                 // Distance in px from the top of the anchorPoint
                 bottomPixels: 10,
                 // Integer: Fading time for loades news items
                 fadeInTime: 800,
                 // HTML: Show this message during the loading process
-                loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container text-center"><i class="fa fa-5x fa-spinner fa-spin"></i>{{ br }}{{ br }}<?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadingInProcess"] ?>...</em></div>',
+                loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container text-center"><i class="fa fa-5x fa-spinner fa-spin"></i>{{br}}{{br}}<?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadingInProcess"] ?>...</em></div>',
 
 
                 // Callbacks
@@ -39,7 +39,7 @@
                 onInitialize: function (instance) {
                     //$('.mod_portfoliolist').addClass('row');
                     //$('.mod_portfoliolist  > div').addClass('col-md-3');
-                    $('.mod_newslist_infinite_scroll .mod_pagination').css({
+                    $('.mod_newslist_infinite_scroll .pagination').css({
                         'visibility': 'hidden',
                         'position': 'absolute',
                         'left': '-99999px'

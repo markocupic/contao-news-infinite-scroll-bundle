@@ -18,7 +18,7 @@
             // CSS selector: Default to $(window)
             scrollContainer: $(window),
             // CSS selector: Pagination links (<a href="infinite?page_n193=5" class="link page-link" title="Gehe zu Seite 5">5</a>)
-            paginationLinks: '.pagination .link.page-link',
+            paginationLinks: '.pagination .link',
             // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
             loadAllOnDomready: false,
             // Use a "load more button"
@@ -103,7 +103,6 @@
             $(_opts.newsContainer + ' ' + _opts.paginationLinks).each(function () {
                 _arrUrls.push($(this).prop('href'));
             });
-
 
             // scrollContainer
             _scrollContainer = $(_opts.scrollContainer)[0];
@@ -249,7 +248,6 @@
             // Call onAppendCallback-callback
             _opts.onAppendCallback(_self);
         }
-
         // Start procedure
         _initialize();
     };

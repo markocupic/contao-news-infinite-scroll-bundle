@@ -12,7 +12,7 @@
 /**
  * Add palettes to tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['contao_news_infinite_scroll'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'];
+$GLOBALS['TL_DCA']['tl_module']['palettes']['newslist_infinite_scroll'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'];
 
 
 $GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = array('tl_module_contao_news_infinite_scroll', 'showJsLibraryHint');
