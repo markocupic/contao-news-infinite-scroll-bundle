@@ -23,24 +23,19 @@
   },
   "autoload": {
     "psr-4": {
-      "psr-4": {
-        "Markocupic\\ContaoNewsInfiniteScrollBundle\\": "src/"
-      },
-      "classmap": [
-        "src/Resources/contao/"
-      ],
-      "exclude-from-classmap": [
-        "src/Resources/contao/config/",
-        "src/Resources/contao/dca/",
-        "src/Resources/contao/languages/",
-        "src/Resources/contao/templates/"
-      ]
-    }
+      "Markocupic\\ContaoNewsInfiniteScrollBundle\\": "src/"
+    },
+    "classmap": [
+      "src/Resources/contao/"
+    ],
+    "exclude-from-classmap": [
+      "src/Resources/contao/config/",
+      "src/Resources/contao/dca/",
+      "src/Resources/contao/languages/",
+      "src/Resources/contao/templates/"
+    ]
   },
   "extra": {
     "contao-manager-plugin": "Markocupic\\ContaoNewsInfiniteScrollBundle\\ContaoManager\\Plugin"
   }
 }
-
-
-
