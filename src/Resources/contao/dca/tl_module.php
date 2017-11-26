@@ -62,7 +62,7 @@ class tl_module_contao_news_infinite_scroll extends Backend
 
         if($objMod->type == 'newslist_infinite_scroll')
         {
-            Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_module']['includeContaoNewsInfiniteScrollTemplate'], 'j_contao_news_infinite_scroll'));
+            Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_module']['includeContaoNewsInfiniteScrollTemplate'], 'j_news_infinite_scroll'));
 
         }
     }

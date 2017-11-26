@@ -4,19 +4,19 @@
 
             /**
              * Generate the ContaoNewsInfiniteScroll object
-             * requires contao_news_infinite_scroll.js
+             * requires news_infinite_scroll.js
              * @type {ContaoNewsInfiniteScroll}
              */
             var contaoNewsInfiniteScroll = new ContaoNewsInfiniteScroll({
                 // CSS selector: Append loaded items to this container
-                newsContainer: '.mod_contao_newslist_infinite_scroll',
+                newsContainer: '.mod_newslist_infinite_scroll',
                 // CSS selector: Default to $(window)
                 scrollContainer: $(window),
                 // CSS selector: Pagination links (<a href="infinite?page_n193=5" class="link page-link" title="Gehe zu Seite 5">5</a>)
                 paginationLinks: '.pagination .link.page-link',
                 // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
                 loadAllOnDomready: false,
-                // Use a "load more button" (Preserve the accessibility of the footer)
+                // Use a "load more button" (Preserve the accessability of the footer)
                 loadMoreButton: true,
                 // Load more button
                 loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container text-center"><button class="btn btn-primary w-100"><?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadMore"] ?></button></div>',
@@ -39,7 +39,7 @@
                 onInitialize: function (instance) {
                     //$('.mod_portfoliolist').addClass('row');
                     //$('.mod_portfoliolist  > div').addClass('col-md-3');
-                    $('.mod_newslist_contao_infinite_scroll .mod_pagination').css({
+                    $('.mod_newslist_infinite_scroll .mod_pagination').css({
                         'visibility': 'hidden',
                         'position': 'absolute',
                         'left': '-99999px'

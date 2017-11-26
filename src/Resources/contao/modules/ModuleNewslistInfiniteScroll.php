@@ -18,7 +18,7 @@ use Patchwork\Utf8;
  *
  * @author Leo Feyer <https://github.com/leofeyer>
  */
-class ModuleContaoNewsInfiniteScroll extends \ModuleNews
+class ModuleNewslistInfiniteScroll extends \ModuleNews
 {
 
 	/**
@@ -64,7 +64,7 @@ class ModuleContaoNewsInfiniteScroll extends \ModuleNews
             global $objPage;
             $objPage->noSearch;
 
-            $this->strTemplate = 'mod_contao_news_infinite_scroll_blank';
+            $this->strTemplate = 'mod_newslist_infinite_scroll';
         }
 
 		return parent::generate();

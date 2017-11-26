@@ -13,7 +13,7 @@
         var _opts = $.extend({
             // Defaults
 
-            // CSS selector: Abbend loaded items to this container
+            // CSS selector: Append loaded items to this container
             newsContainer: '.mod_newslist_infinite_scroll',
             // CSS selector: Default to $(window)
             scrollContainer: $(window),
