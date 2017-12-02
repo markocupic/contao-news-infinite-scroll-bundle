@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  * ClassContaoNewsInfiniteScrollExtension
  * @package Markocupic\ContaoNewsInfiniteScrollBundle\DependencyInjection
  */
-class ContaoNewsInfiniteScrollExtension extends Extension
+class MarkocupicContaoNewsInfiniteScrollExtension extends Extension
 {
     /**
      * {@inheritdoc}
