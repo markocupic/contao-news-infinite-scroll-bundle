@@ -16,16 +16,17 @@
                 paginationLinks: '.pagination .link',
                 // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
                 loadAllOnDomready: false,
-                // Use a "load more button" (Preserve the accessability of the footer)
+                // Use a "load more button" (Preserve the accessibility of the footer)
+                // !!!! Important Set loadMoreButton to false, if you want to autoload items
                 loadMoreButton: true,
                 // Load more button
                 loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container text-center"><button class="btn btn-primary w-100"><?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadMore"] ?></button></div>',
                 // CSS selector: When you scroll and the window has reached the anchor point, requests will start
                 anchorPoint: '.mod_newslist_infinite_scroll',
                 // Distance in px from the top of the anchorPoint
-                bottomPixels: 10,
+                bottomPixels: 100,
                 // Integer: Fading time for loades news items
-                fadeInTime: 800,
+                fadeInTime: 400,
                 // HTML: Show this message during the loading process
                 loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container text-center"><i class="fa fa-5x fa-spinner fa-spin"></i>{{br}}{{br}}<?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadingInProcess"] ?>...</em></div>',
 
@@ -50,6 +51,7 @@
                  * @param instance
                  */
                 onXHRStart: function (instance) {
+                    // Do some actions
                 },
 
                 /**
@@ -59,6 +61,7 @@
                  * @returns string
                  */
                 onXHRComplete: function (html, instance) {
+                    // Do some actions
                     return html;
                 },
 
@@ -75,6 +78,7 @@
                  * @param instance
                  */
                 onAppendCallback: function (instance) {
+                    // Do some actions
                 }
             });
         });
