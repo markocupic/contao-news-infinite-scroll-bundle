@@ -1,65 +1,69 @@
 <?php
 
 /**
- * Contao Open Source CMS
+ * Contao News Infinite Scroll Bundle
  *
- * Copyright (c) 2005-2016 Leo Feyer
+ * Copyright (c) 2018 Marko Cupic
+ *
+ * @author Marko Cupic <https://github.com/markocupic>
  *
  * @license LGPL-3.0+
  */
 
 namespace Markocupic;
 
+
 use Patchwork\Utf8;
 
 
 /**
- * Front end module "contao news infinite scroll".
+ * Display Infinite Scroll Newslist Module
  *
- * @author Leo Feyer <https://github.com/leofeyer>
+ * Class ModuleNewslistInfiniteScroll
+ * @package Markocupic
  */
 class ModuleNewslistInfiniteScroll extends \ModuleNews
 {
 
-	/**
-	 * Template
-	 * @var string
-	 */
-	protected $strTemplate = 'mod_newslist';
+    /**
+     * Template
+     * @var string
+     */
+    protected $strTemplate = 'mod_newslist';
 
 
-	/**
-	 * Display a wildcard in the back end
-	 *
-	 * @return string
-	 */
-	public function generate()
-	{
-		if (TL_MODE == 'BE')
-		{
-			/** @var \BackendTemplate|object $objTemplate */
-			$objTemplate = new \BackendTemplate('be_wildcard');
+    /**
+     * Display a wildcard in the back end
+     *
+     * @return string
+     */
+    public function generate()
+    {
+        if (TL_MODE == 'BE')
+        {
+            /** @var \BackendTemplate|object $objTemplate */
+            $objTemplate = new \BackendTemplate('be_wildcard');
 
-			$objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['contao_news_infinite_scroll'][0]) . ' ###';
-			$objTemplate->title = $this->headline;
-			$objTemplate->id = $this->id;
-			$objTemplate->link = $this->name;
-			$objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['contao_news_infinite_scroll'][0]) . ' ###';
+            $objTemplate->title = $this->headline;
+            $objTemplate->id = $this->id;
+            $objTemplate->link = $this->name;
+            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
 
-			return $objTemplate->parse();
-		}
+            return $objTemplate->parse();
+        }
 
-		$this->news_archives = $this->sortOutProtected(\StringUtil::deserialize($this->news_archives));
+        $this->news_archives = $this->sortOutProtected(\StringUtil::deserialize($this->news_archives));
 
-		// Return if there are no archives
-		if (!is_array($this->news_archives) || empty($this->news_archives))
-		{
-			return '';
-		}
+        // Return if there are no archives
+        if (!is_array($this->news_archives) || empty($this->news_archives))
+        {
+            return '';
+        }
 
         // Do not add the page to the search index on ajax calls
         // Send articles without a frame to the browser
-        if(\Environment::get('isAjaxRequest'))
+        if (\Environment::get('isAjaxRequest'))
         {
             global $objPage;
             $objPage->noSearch;
@@ -67,110 +71,110 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
             $this->strTemplate = 'mod_newslist_infinite_scroll';
         }
 
-		return parent::generate();
-	}
+        return parent::generate();
+    }
 
 
-	/**
-	 * Generate the module
-	 */
-	protected function compile()
-	{
-		$limit = null;
-		$offset = intval($this->skipFirst);
+    /**
+     * Generate the module
+     */
+    protected function compile()
+    {
+        $limit = null;
+        $offset = intval($this->skipFirst);
 
-		// Maximum number of items
-		if ($this->numberOfItems > 0)
-		{
-			$limit = $this->numberOfItems;
-		}
+        // Maximum number of items
+        if ($this->numberOfItems > 0)
+        {
+            $limit = $this->numberOfItems;
+        }
 
-		// Handle featured news
-		if ($this->news_featured == 'featured')
-		{
-			$blnFeatured = true;
-		}
-		elseif ($this->news_featured == 'unfeatured')
-		{
-			$blnFeatured = false;
-		}
-		else
-		{
-			$blnFeatured = null;
-		}
+        // Handle featured news
+        if ($this->news_featured == 'featured')
+        {
+            $blnFeatured = true;
+        }
+        elseif ($this->news_featured == 'unfeatured')
+        {
+            $blnFeatured = false;
+        }
+        else
+        {
+            $blnFeatured = null;
+        }
 
-		$this->Template->articles = array();
-		$this->Template->empty = $GLOBALS['TL_LANG']['MSC']['emptyList'];
+        $this->Template->articles = array();
+        $this->Template->empty = $GLOBALS['TL_LANG']['MSC']['emptyList'];
 
-		// Get the total number of items
-		$intTotal = $this->countItems($this->news_archives, $blnFeatured);
+        // Get the total number of items
+        $intTotal = $this->countItems($this->news_archives, $blnFeatured);
 
-		if ($intTotal < 1)
-		{
-			return;
-		}
+        if ($intTotal < 1)
+        {
+            return;
+        }
 
-		$total = $intTotal - $offset;
+        $total = $intTotal - $offset;
 
-		// Split the results
-		if ($this->perPage > 0 && (!isset($limit) || $this->numberOfItems > $this->perPage))
-		{
-			// Adjust the overall limit
-			if (isset($limit))
-			{
-				$total = min($limit, $total);
-			}
+        // Split the results
+        if ($this->perPage > 0 && (!isset($limit) || $this->numberOfItems > $this->perPage))
+        {
+            // Adjust the overall limit
+            if (isset($limit))
+            {
+                $total = min($limit, $total);
+            }
 
-			// Get the current page
-			$id = 'page_n' . $this->id;
-			$page = (\Input::get($id) !== null) ? \Input::get($id) : 1;
+            // Get the current page
+            $id = 'page_n' . $this->id;
+            $page = (\Input::get($id) !== null) ? \Input::get($id) : 1;
 
-			// Do not index or cache the page if the page number is outside the range
-			if ($page < 1 || $page > max(ceil($total/$this->perPage), 1))
-			{
-				/** @var \PageModel $objPage */
-				global $objPage;
+            // Do not index or cache the page if the page number is outside the range
+            if ($page < 1 || $page > max(ceil($total / $this->perPage), 1))
+            {
+                /** @var \PageModel $objPage */
+                global $objPage;
 
-				/** @var \PageError404 $objHandler */
-				$objHandler = new $GLOBALS['TL_PTY']['error_404']();
-				$objHandler->generate($objPage->id);
-			}
+                /** @var \PageError404 $objHandler */
+                $objHandler = new $GLOBALS['TL_PTY']['error_404']();
+                $objHandler->generate($objPage->id);
+            }
 
-			// Set limit and offset
-			$limit = $this->perPage;
-			$offset += (max($page, 1) - 1) * $this->perPage;
-			$skip = intval($this->skipFirst);
+            // Set limit and offset
+            $limit = $this->perPage;
+            $offset += (max($page, 1) - 1) * $this->perPage;
+            $skip = intval($this->skipFirst);
 
-			// Overall limit
-			if ($offset + $limit > $total + $skip)
-			{
-				$limit = $total + $skip - $offset;
-			}
+            // Overall limit
+            if ($offset + $limit > $total + $skip)
+            {
+                $limit = $total + $skip - $offset;
+            }
 
 
             /** set maxPaginationLinks **/
-            $maxPaginationLinks = round($total/$this->perPage + 1);
+            $maxPaginationLinks = round($total / $this->perPage + 1);
 
-			// Add the pagination menu
-			$objPagination = new \Pagination($total, $this->perPage,  $maxPaginationLinks , $id);
-			$this->Template->pagination = $objPagination->generate("\n  ");
-		}
+            // Add the pagination menu
+            $objPagination = new \Pagination($total, $this->perPage, $maxPaginationLinks, $id);
+            $this->Template->pagination = $objPagination->generate("\n  ");
+        }
 
-		$objArticles = $this->fetchItems($this->news_archives, $blnFeatured, ($limit ?: 0), $offset);
+        $objArticles = $this->fetchItems($this->news_archives, $blnFeatured, ($limit ?: 0), $offset);
 
-		// Add the articles
-		if ($objArticles !== null)
-		{
-			$this->Template->articles = $this->parseArticles($objArticles);
-		}
+        // Add the articles
+        if ($objArticles !== null)
+        {
+            $this->Template->articles = $this->parseArticles($objArticles);
+        }
 
-		$this->Template->archives = $this->news_archives;
+        $this->Template->archives = $this->news_archives;
 
-		// Add Css Class
-        $this->Template->cssID[1] = $this->Template->cssID[1] == '' ? 'ajaxCall' :  $this->Template->cssID[1] . ' ajaxCall';
+        // Add Css Class
+        $this->Template->cssID[1] = $this->Template->cssID[1] == '' ? 'ajaxCall' : $this->Template->cssID[1] . ' ajaxCall';
 
 
-        if(\Environment::get('isAjaxRequest'))
+        if (\Environment::get('isAjaxRequest'))
         {
             $this->Template->headline = '';
             $this->Template->pagination = '';
@@ -179,69 +183,69 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
             $this->Template->output();
             exit();
         }
-	}
+    }
 
 
-	/**
-	 * Count the total matching items
-	 *
-	 * @param array $newsArchives
-	 * @param boolean $blnFeatured
-	 *
-	 * @return integer
-	 */
-	protected function countItems($newsArchives, $blnFeatured)
-	{
-		// HOOK: add custom logic
-		if (isset($GLOBALS['TL_HOOKS']['newsListCountItems']) && is_array($GLOBALS['TL_HOOKS']['newsListCountItems']))
-		{
-			foreach ($GLOBALS['TL_HOOKS']['newsListCountItems'] as $callback)
-			{
-				if (($intResult = \System::importStatic($callback[0])->{$callback[1]}($newsArchives, $blnFeatured, $this)) === false)
-				{
-					continue;
-				}
+    /**
+     * Count the total matching items
+     *
+     * @param array $newsArchives
+     * @param boolean $blnFeatured
+     *
+     * @return integer
+     */
+    protected function countItems($newsArchives, $blnFeatured)
+    {
+        // HOOK: add custom logic
+        if (isset($GLOBALS['TL_HOOKS']['newsListCountItems']) && is_array($GLOBALS['TL_HOOKS']['newsListCountItems']))
+        {
+            foreach ($GLOBALS['TL_HOOKS']['newsListCountItems'] as $callback)
+            {
+                if (($intResult = \System::importStatic($callback[0])->{$callback[1]}($newsArchives, $blnFeatured, $this)) === false)
+                {
+                    continue;
+                }
 
-				if (is_int($intResult))
-				{
-					return $intResult;
-				}
-			}
-		}
+                if (is_int($intResult))
+                {
+                    return $intResult;
+                }
+            }
+        }
 
-		return \NewsModel::countPublishedByPids($newsArchives, $blnFeatured);
-	}
+        return \NewsModel::countPublishedByPids($newsArchives, $blnFeatured);
+    }
 
 
-	/**
-	 * Fetch the matching items
-	 *
-	 * @param  array   $newsArchives
-	 * @param  boolean $blnFeatured
-	 * @param  integer $limit
-	 * @param  integer $offset
-	 *
-	 * @return \Model\Collection|\NewsModel|null
-	 */
-	protected function fetchItems($newsArchives, $blnFeatured, $limit, $offset)
-	{
-		// HOOK: add custom logic
-		if (isset($GLOBALS['TL_HOOKS']['newsListFetchItems']) && is_array($GLOBALS['TL_HOOKS']['newsListFetchItems']))
-		{
-			foreach ($GLOBALS['TL_HOOKS']['newsListFetchItems'] as $callback)
-			{
-				if (($objCollection = \System::importStatic($callback[0])->{$callback[1]}($newsArchives, $blnFeatured, $limit, $offset, $this)) === false)
-				{
-					continue;
-				}
+    /**
+     * Fetch the matching items
+     *
+     * @param  array $newsArchives
+     * @param  boolean $blnFeatured
+     * @param  integer $limit
+     * @param  integer $offset
+     *
+     * @return \Model\Collection|\NewsModel|null
+     */
+    protected function fetchItems($newsArchives, $blnFeatured, $limit, $offset)
+    {
+        // HOOK: add custom logic
+        if (isset($GLOBALS['TL_HOOKS']['newsListFetchItems']) && is_array($GLOBALS['TL_HOOKS']['newsListFetchItems']))
+        {
+            foreach ($GLOBALS['TL_HOOKS']['newsListFetchItems'] as $callback)
+            {
+                if (($objCollection = \System::importStatic($callback[0])->{$callback[1]}($newsArchives, $blnFeatured, $limit, $offset, $this)) === false)
+                {
+                    continue;
+                }
 
-				if ($objCollection === null || $objCollection instanceof \Model\Collection)
-				{
-					return $objCollection;
-				}
-			}
-		}
+                if ($objCollection === null || $objCollection instanceof \Model\Collection)
+                {
+                    return $objCollection;
+                }
+            }
+        }
 
-		return \NewsModel::findPublishedByPids($newsArchives, $blnFeatured, $limit, $offset);
-	}
+        return \NewsModel::findPublishedByPids($newsArchives, $blnFeatured, $limit, $offset);
+    }
 }

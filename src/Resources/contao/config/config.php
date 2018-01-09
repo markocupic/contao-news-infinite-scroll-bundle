@@ -1,12 +1,18 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: Marko
- * Date: 06.09.2015
- * Time: 17:20
+ * Contao News Infinite Scroll Bundle
+ *
+ * Copyright (c) 2018 Marko Cupic
+ *
+ * @author Marko Cupic <https://github.com/markocupic>
+ *
+ * @license LGPL-3.0+
  */
-if(TL_MODE == 'FE' && !\Environment::get('isAjaxRequest')){
+
+
+if (TL_MODE == 'FE' && !\Environment::get('isAjaxRequest'))
+{
     $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaonewsinfinitescroll/js/news_infinite_scroll.js';
 }
 

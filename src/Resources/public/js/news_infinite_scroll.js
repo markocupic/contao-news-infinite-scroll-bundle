@@ -1,8 +1,11 @@
 /**
- * ContaoNewsInfiniteScroll
- * https://github.com/markocupic/contao-news-infinite-scroll-bundle
- * Marko Cupic, Oberkirch (Switzerland)
- * Copyright 2017
+ * Contao News Infinite Scroll Bundle
+ *
+ * Copyright (c) 2018 Marko Cupic
+ *
+ * @author Marko Cupic <https://github.com/markocupic>
+ *
+ * @license LGPL-3.0+
  */
 
 (function ($) {
@@ -127,11 +130,11 @@
             if (_opts.loadAllOnDomready === true) {
                 _load();
                 _xhrInterval = setInterval(_load, 3000);
-            }else if(_opts.loadMoreButton === true){
-                _self.loadMoreBtn =  $(_opts.loadMoreButtonMarkup);
+            } else if (_opts.loadMoreButton === true) {
+                _self.loadMoreBtn = $(_opts.loadMoreButtonMarkup);
                 _self.loadMoreBtn.insertAfter(_newsContainer)
                 _self.loadMoreBtn.addClass('inf-scr-load-more-btn-container');
-                _self.loadMoreBtn.click(function(event){
+                _self.loadMoreBtn.click(function (event) {
                     $(this).hide();
                     _load();
                 });
@@ -154,7 +157,6 @@
 
             if (_blnLoadingInProcess == 1 || _blnLoadedAllItems == 1) return;
             _self.blnHasError = false;
-
 
 
             _self.currentUrl = _arrUrls[_self.urlIndex];
@@ -211,8 +213,7 @@
                             }
                         }
 
-                        if( _self.loadMoreBtn !== null)
-                        {
+                        if (_self.loadMoreBtn !== null) {
                             _self.loadMoreBtn.show();
                         }
 

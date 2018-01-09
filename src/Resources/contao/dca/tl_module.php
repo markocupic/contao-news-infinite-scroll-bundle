@@ -1,9 +1,11 @@
 <?php
 
 /**
- * Contao Open Source CMS
+ * Contao News Infinite Scroll Bundle
  *
- * Copyright (c) 2005-2015 Leo Feyer
+ * Copyright (c) 2018 Marko Cupic
+ *
+ * @author Marko Cupic <https://github.com/markocupic>
  *
  * @license LGPL-3.0+
  */
@@ -21,7 +23,7 @@ $GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = array('tl_modul
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @author Leo Feyer <https://github.com/leofeyer>
+ * @author Marko Cupic <https://github.com/markocupic>
  */
 class tl_module_contao_news_infinite_scroll extends Backend
 {
@@ -60,7 +62,7 @@ class tl_module_contao_news_infinite_scroll extends Backend
             return;
         }
 
-        if($objMod->type == 'newslist_infinite_scroll')
+        if ($objMod->type == 'newslist_infinite_scroll')
         {
             Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_module']['includeContaoNewsInfiniteScrollTemplate'], 'j_news_infinite_scroll'));
 
