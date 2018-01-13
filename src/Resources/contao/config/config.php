@@ -13,7 +13,7 @@
 
 if (TL_MODE == 'FE' && !\Environment::get('isAjaxRequest'))
 {
-    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaonewsinfinitescroll/js/news_infinite_scroll.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaonewsinfinitescroll/js/news_infinite_scroll.min.js|static';
 }
 
 $GLOBALS['FE_MOD']['news']['newslist_infinite_scroll'] = 'Markocupic\ModuleNewslistInfiniteScroll';

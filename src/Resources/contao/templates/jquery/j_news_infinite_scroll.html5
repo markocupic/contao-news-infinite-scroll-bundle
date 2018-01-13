@@ -41,7 +41,6 @@
                     //$('.mod_portfoliolist').addClass('row');
                     //$('.mod_portfoliolist  > div').addClass('col-md-3');
                     $('.mod_newslist_infinite_scroll .pagination').hide();
-                    $('.mod_newslist_infinite_scroll .pagination').parent('div.block').hide();
                     // Return false to abort initialization
                     return true;
                 },
