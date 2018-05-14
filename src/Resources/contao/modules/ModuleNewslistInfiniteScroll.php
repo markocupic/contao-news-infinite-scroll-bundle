@@ -129,6 +129,12 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
             $id = 'page_n' . $this->id;
             $page = (\Input::get($id) !== null) ? \Input::get($id) : 1;
 
+            // Prevent duplicate content by adding the canonical url into the head
+            if (\Input::get($id) !== null)
+            {
+                $GLOBALS['TL_HEAD'][] = '<link rel="canonical" href="' . \Environment::get('url') . '/' . str_replace('?' . \Environment::get('queryString'), '', \Environment::get('request')) . '" />';
+            }
+
             // Do not index or cache the page if the page number is outside the range
             if ($page < 1 || $page > max(ceil($total / $this->perPage), 1))
             {
