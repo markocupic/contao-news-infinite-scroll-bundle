@@ -11,13 +11,8 @@
  */
 
 
-/**
- * Add palettes to tl_module
- */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['newslist_infinite_scroll'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'];
-
-
 $GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = array('tl_module_contao_news_infinite_scroll', 'showJsLibraryHint');
+$GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = array('tl_module_contao_news_infinite_scroll', 'setPalette');
 
 
 /**
@@ -25,7 +20,7 @@ $GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = array('tl_modul
  *
  * @author Marko Cupic <https://github.com/markocupic>
  */
-class tl_module_contao_news_infinite_scroll extends Backend
+class tl_module_contao_news_infinite_scroll extends \Contao\Backend
 {
 
     /**
@@ -55,7 +50,7 @@ class tl_module_contao_news_infinite_scroll extends Backend
             return;
         }
 
-        $objMod = ModuleModel::findByPk($dc->id);
+        $objMod = \Contao\ModuleModel::findByPk($dc->id);
 
         if ($objMod === null)
         {
@@ -64,8 +59,16 @@ class tl_module_contao_news_infinite_scroll extends Backend
 
         if ($objMod->type == 'newslist_infinite_scroll')
         {
-            Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_module']['includeContaoNewsInfiniteScrollTemplate'], 'j_news_infinite_scroll'));
+            \Contao\Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_module']['includeContaoNewsInfiniteScrollTemplate'], 'j_news_infinite_scroll'));
 
         }
+    }
+
+    /**
+     * Sets the newslist_infinite_scroll palette as late as possible.
+     */
+    public function setPalette()
+    {
+        $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist_infinite_scroll'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'];
     }
 }

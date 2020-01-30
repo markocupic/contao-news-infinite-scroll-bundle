@@ -13,6 +13,16 @@
 namespace Markocupic;
 
 
+use Contao\BackendTemplate;
+use Contao\Config;
+use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\Environment;
+use Contao\Input;
+use Contao\Model\Collection;
+use Contao\ModuleNewsList;
+use Contao\NewsModel;
+use Contao\Pagination;
+use Contao\System;
 use Patchwork\Utf8;
 
 
@@ -22,7 +32,7 @@ use Patchwork\Utf8;
  * Class ModuleNewslistInfiniteScroll
  * @package Markocupic
  */
-class ModuleNewslistInfiniteScroll extends \ModuleNews
+class ModuleNewslistInfiniteScroll extends ModuleNewsList
 {
 
     /**
@@ -41,9 +51,7 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
     {
         if (TL_MODE == 'BE')
         {
-            /** @var \BackendTemplate|object $objTemplate */
-            $objTemplate = new \BackendTemplate('be_wildcard');
-
+            $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['contao_news_infinite_scroll'][0]) . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
@@ -53,17 +61,9 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
             return $objTemplate->parse();
         }
 
-        $this->news_archives = $this->sortOutProtected(\StringUtil::deserialize($this->news_archives));
-
-        // Return if there are no archives
-        if (!is_array($this->news_archives) || empty($this->news_archives))
-        {
-            return '';
-        }
-
         // Do not add the page to the search index on ajax calls
         // Send articles without a frame to the browser
-        if (\Environment::get('isAjaxRequest'))
+        if (Environment::get('isAjaxRequest'))
         {
             global $objPage;
             $objPage->noSearch;
@@ -81,7 +81,7 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
     protected function compile()
     {
         $limit = null;
-        $offset = intval($this->skipFirst);
+        $offset = (int) $this->skipFirst;
 
         // Maximum number of items
         if ($this->numberOfItems > 0)
@@ -127,29 +127,24 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
 
             // Get the current page
             $id = 'page_n' . $this->id;
-            $page = (\Input::get($id) !== null) ? \Input::get($id) : 1;
+            $page = (Input::get($id) !== null) ? Input::get($id) : 1;
 
             // Prevent duplicate content by adding the canonical url into the head
-            if (\Input::get($id) !== null)
+            if (Input::get($id) !== null)
             {
-                $GLOBALS['TL_HEAD'][] = '<link rel="canonical" href="' . \Environment::get('url') . '/' . str_replace('?' . \Environment::get('queryString'), '', \Environment::get('request')) . '" />';
+                $GLOBALS['TL_HEAD'][] = '<link rel="canonical" href="' . Environment::get('url') . '/' . str_replace('?' . Environment::get('queryString'), '', Environment::get('request')) . '" />';
             }
 
             // Do not index or cache the page if the page number is outside the range
             if ($page < 1 || $page > max(ceil($total / $this->perPage), 1))
             {
-                /** @var \PageModel $objPage */
-                global $objPage;
-
-                /** @var \PageError404 $objHandler */
-                $objHandler = new $GLOBALS['TL_PTY']['error_404']();
-                $objHandler->generate($objPage->id);
+                throw new PageNotFoundException('Page not found: ' . Environment::get('uri'));
             }
 
             // Set limit and offset
             $limit = $this->perPage;
             $offset += (max($page, 1) - 1) * $this->perPage;
-            $skip = intval($this->skipFirst);
+            $skip = (int) $this->skipFirst;
 
             // Overall limit
             if ($offset + $limit > $total + $skip)
@@ -157,12 +152,8 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
                 $limit = $total + $skip - $offset;
             }
 
-
-            /** set maxPaginationLinks **/
-            $maxPaginationLinks = round($total / $this->perPage + 1);
-
             // Add the pagination menu
-            $objPagination = new \Pagination($total, $this->perPage, $maxPaginationLinks, $id);
+            $objPagination = new Pagination($total, $this->perPage, Config::get('maxPaginationLinks'), $id);
             $this->Template->pagination = $objPagination->generate("\n  ");
         }
 
@@ -180,7 +171,7 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
         $this->Template->cssID[1] = $this->Template->cssID[1] == '' ? 'ajaxCall' : $this->Template->cssID[1] . ' ajaxCall';
 
 
-        if (\Environment::get('isAjaxRequest'))
+        if (Environment::get('isAjaxRequest'))
         {
             $this->Template->headline = '';
             $this->Template->pagination = '';
@@ -203,23 +194,23 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
     protected function countItems($newsArchives, $blnFeatured)
     {
         // HOOK: add custom logic
-        if (isset($GLOBALS['TL_HOOKS']['newsListCountItems']) && is_array($GLOBALS['TL_HOOKS']['newsListCountItems']))
+        if (isset($GLOBALS['TL_HOOKS']['newsListCountItems']) && \is_array($GLOBALS['TL_HOOKS']['newsListCountItems']))
         {
             foreach ($GLOBALS['TL_HOOKS']['newsListCountItems'] as $callback)
             {
-                if (($intResult = \System::importStatic($callback[0])->{$callback[1]}($newsArchives, $blnFeatured, $this)) === false)
+                if (($intResult = System::importStatic($callback[0])->{$callback[1]}($newsArchives, $blnFeatured, $this)) === false)
                 {
                     continue;
                 }
 
-                if (is_int($intResult))
+                if (\is_int($intResult))
                 {
                     return $intResult;
                 }
             }
         }
 
-        return \NewsModel::countPublishedByPids($newsArchives, $blnFeatured);
+        return NewsModel::countPublishedByPids($newsArchives, $blnFeatured);
     }
 
 
@@ -231,27 +222,58 @@ class ModuleNewslistInfiniteScroll extends \ModuleNews
      * @param  integer $limit
      * @param  integer $offset
      *
-     * @return \Model\Collection|\NewsModel|null
+     * @return Collection|NewsModel|null
      */
     protected function fetchItems($newsArchives, $blnFeatured, $limit, $offset)
     {
         // HOOK: add custom logic
-        if (isset($GLOBALS['TL_HOOKS']['newsListFetchItems']) && is_array($GLOBALS['TL_HOOKS']['newsListFetchItems']))
+        if (isset($GLOBALS['TL_HOOKS']['newsListFetchItems']) && \is_array($GLOBALS['TL_HOOKS']['newsListFetchItems']))
         {
             foreach ($GLOBALS['TL_HOOKS']['newsListFetchItems'] as $callback)
             {
-                if (($objCollection = \System::importStatic($callback[0])->{$callback[1]}($newsArchives, $blnFeatured, $limit, $offset, $this)) === false)
+                if (($objCollection = System::importStatic($callback[0])->{$callback[1]}($newsArchives, $blnFeatured, $limit, $offset, $this)) === false)
                 {
                     continue;
                 }
 
-                if ($objCollection === null || $objCollection instanceof \Model\Collection)
+                if ($objCollection === null || $objCollection instanceof Collection)
                 {
                     return $objCollection;
                 }
             }
         }
 
-        return \NewsModel::findPublishedByPids($newsArchives, $blnFeatured, $limit, $offset);
+        // Determine sorting
+        $t = NewsModel::getTable();
+        $order = '';
+
+        if ($this->news_featured == 'featured_first')
+        {
+            $order .= "$t.featured DESC, ";
+        }
+
+        switch ($this->news_order)
+        {
+            case 'order_headline_asc':
+                $order .= "$t.headline";
+                break;
+
+            case 'order_headline_desc':
+                $order .= "$t.headline DESC";
+                break;
+
+            case 'order_random':
+                $order .= "RAND()";
+                break;
+
+            case 'order_date_asc':
+                $order .= "$t.date";
+                break;
+
+            default:
+                $order .= "$t.date DESC";
+        }
+
+        return NewsModel::findPublishedByPids($newsArchives, $blnFeatured, $limit, $offset, ['order'=>$order]);
     }
 }
