@@ -3,17 +3,26 @@
 /**
  * Contao News Infinite Scroll Bundle
  *
- * Copyright (c) 2018 Marko Cupic
+ * Copyright (c) 2020 Marko Cupic
  *
  * @author Marko Cupic <https://github.com/markocupic>
  *
  * @license LGPL-3.0+
  */
 
+// Onload callbacks (keep this order!)
+$GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = ['tl_module_contao_news_infinite_scroll', 'showJsLibraryHint'];
+$GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = ['tl_module_contao_news_infinite_scroll', 'addFieldsToPalette'];
+$GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = ['tl_module_contao_news_infinite_scroll', 'setPalette'];
 
-$GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = array('tl_module_contao_news_infinite_scroll', 'showJsLibraryHint');
-$GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = array('tl_module_contao_news_infinite_scroll', 'setPalette');
-
+// Fields
+$GLOBALS['TL_DCA']['tl_module']['fields']['newsInfiniteScroll_addCanonicalTag'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_module']['newsInfiniteScroll_addCanonicalTag'],
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "char(1) NOT NULL default ''"
+];
 
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
@@ -34,7 +43,6 @@ class tl_module_contao_news_infinite_scroll extends \Contao\Backend
 
     /**
      * Show a hint if a JavaScript library needs to be included in the page layout
-     *
      * @param object
      */
     public function showJsLibraryHint($dc)
@@ -57,10 +65,32 @@ class tl_module_contao_news_infinite_scroll extends \Contao\Backend
             return;
         }
 
-        if ($objMod->type == 'newslist_infinite_scroll')
+        if ($objMod->type === 'newslist_infinite_scroll')
         {
             \Contao\Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_module']['includeContaoNewsInfiniteScrollTemplate'], 'j_news_infinite_scroll'));
+        }
+    }
 
+    /**
+     * Add dca fields to palette
+     * @param $dc
+     */
+    public function addFieldsToPalette($dc)
+    {
+        $objMod = \Contao\ModuleModel::findByPk($dc->id);
+
+        if ($objMod === null)
+        {
+            return;
+        }
+
+        if ($objMod->type === 'newslist_infinite_scroll')
+        {
+            // Manipulate palettes
+            \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+                ->addLegend('news_infinite_scroll_legend', 'protected_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+                ->addField(['newsInfiniteScroll_addCanonicalTag'], 'news_infinite_scroll_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+                ->applyToPalette('newslist', 'tl_module');
         }
     }
 
@@ -71,4 +101,5 @@ class tl_module_contao_news_infinite_scroll extends \Contao\Backend
     {
         $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist_infinite_scroll'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'];
     }
+
 }

@@ -3,7 +3,7 @@
 /**
  * Contao News Infinite Scroll Bundle
  *
- * Copyright (c) 2018 Marko Cupic
+ * Copyright (c) 2020 Marko Cupic
  *
  * @author Marko Cupic <https://github.com/markocupic>
  *
@@ -17,3 +17,5 @@ if (TL_MODE == 'FE' && !\Environment::get('isAjaxRequest'))
 }
 
 $GLOBALS['FE_MOD']['news']['newslist_infinite_scroll'] = 'Markocupic\ModuleNewslistInfiniteScroll';
+
+$GLOBALS['TL_HOOKS']['parseArticles'][] = ['Markocupic\ContaoNewsInfiniteScrollBundle\EventListener\Contao\ParseArticlesListener', 'addCanonicalTag'];
