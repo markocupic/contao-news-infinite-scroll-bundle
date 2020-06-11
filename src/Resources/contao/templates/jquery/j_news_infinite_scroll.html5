@@ -13,9 +13,9 @@
                 // CSS selector: Default to $(window)
                 scrollContainer: $(window),
                 // CSS selector: Pagination next  (<ul class="pagination"><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul>)
-                paginationNextLink: '.pagination > .next > a.next',
+                paginationNextLink: '.pagination .next > a.next',
                 // CSS selector: Pagination last  (<ul class="pagination"><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul>)
-                paginationLastLink: '.pagination > .last > a.last',
+                paginationLastLink: '.pagination .last > a.last',
                 // Pagination url regex pattern
                 paginationUrlRegexPattern: 'page_n(\\d*)=(\\d*)',
                 // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
@@ -43,7 +43,7 @@
                  */
                 onInitialize: function (instance) {
                     // Hide pagination
-                    $('.mod_newslist_infinite_scroll .pagination').hide();
+                    $(instance.getOption('newsContainer') + ' .pagination').hide();
 
                     // Return false to abort initialization
                     return true;

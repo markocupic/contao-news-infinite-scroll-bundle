@@ -13,7 +13,7 @@
      * @param {Object} options
      */
     ContaoNewsInfiniteScroll = function (options) {
-        var _opts = $.extend({
+        let _opts = $.extend({
             // Defaults
 
             // CSS selector: Append loaded items to this container
@@ -58,14 +58,14 @@
 
 
         // Private variables
-        var _self = this;
-        var _newsContainer = null;
-        var _anchorPoint = null;
-        var _scrollContainer = null;
-        var _blnLoadingInProcess = 0;
-        var _arrUrls = [];
-        var _blnLoadedAllItems = 0;
-        var _xhrInterval = 0;
+        let _self = this;
+        let _newsContainer = null;
+        let _anchorPoint = null;
+        let _scrollContainer = null;
+        let _blnLoadingInProcess = 0;
+        let _arrUrls = [];
+        let _blnLoadedAllItems = 0;
+        let _xhrInterval = 0;
 
         // Public variables
         _self.blnHasError = false;
@@ -95,7 +95,7 @@
         /**
          * Init function
          */
-        var _initialize = function () {
+        let _initialize = function () {
             // Call onInitialize-callback
             if (_opts.onInitialize(_self) !== true) {
                 return;
@@ -126,6 +126,7 @@
                     // Skip initialization process
                     return;
                 }
+                let idModule = matchNext[1]
                 let idNext = matchNext[2];
                 let idLast = idNext;
 
@@ -145,7 +146,7 @@
 
                 // Generate all urls from first to last
                 for (i = idNext; i <= idLast; i++) {
-                    let url = hrefNext.replace(regexpNext, 'page_n$1=' + i);
+                    let url = hrefNext.replace(regexpNext, 'page_n' + idModule + '=' + i);
                     _arrUrls.push(url);
                 }
             }
@@ -196,7 +197,7 @@
         /**
          * Fetch html from server
          */
-        var _load = function () {
+        let _load = function () {
 
             if (_blnLoadingInProcess == 1 || _blnLoadedAllItems == 1) return;
             _self.blnHasError = false;
@@ -222,7 +223,7 @@
                 }).done(function (data) {
                     _self.blnHasError = false;
                     _self.response = data;
-                    var html = _opts.onXHRComplete(_self.response, _self);
+                    let html = _opts.onXHRComplete(_self.response, _self);
                     if (_self.blnHasError === false) {
                         _self.urlIndex++;
                         setTimeout(function () {
@@ -276,7 +277,7 @@
         /**
          * Fail Method
          */
-        var _fail = function () {
+        let _fail = function () {
 
             _blnLoadingInProcess = 0;
             // Call onXHRFail-callback
@@ -287,7 +288,7 @@
          * Append items to DOM
          * @param html
          */
-        var _appendToDom = function (html) {
+        let _appendToDom = function (html) {
             // Append html to dom and fade in
             $(html).hide().appendTo(_newsContainer).fadeIn(_opts.fadeInTime);
 
