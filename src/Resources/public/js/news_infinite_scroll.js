@@ -134,6 +134,7 @@
                     // get last request url
                     let last = $(_opts.newsContainer + ' ' + _opts.paginationLastLink).first();
                     let hrefLast = $(last).prop('href');
+                    // page_n(\\d*)=(\\d*)/g;
                     let regexpLast = new RegExp(_opts.paginationUrlRegexPattern, "g");
                     let matchLast = regexpLast.exec(hrefLast);
                     if (matchLast) {
@@ -142,10 +143,11 @@
                     }
                 }
 
-                // Generate all urls from first and last
+                // Generate all urls from first to last
                 for (i = idNext; i <= idLast; i++) {
-                    let url = hrefNext.replace('page_n' + matchNext[1] + '=' + matchNext[2], 'page_n' + matchNext[1] + '=' + i);
+                    let url = hrefNext.replace(regexpNext, 'page_n$1=' + i);
                     _arrUrls.push(url);
+                    console.log(url);
                 }
             }
 
@@ -192,9 +194,8 @@
             }
         };
 
-
         /**
-         * Load html with xhr
+         * Fetch html from server
          */
         var _load = function () {
 
