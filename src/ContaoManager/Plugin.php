@@ -10,12 +10,13 @@
  * @license LGPL-3.0+
  */
 
-
 namespace Markocupic\ContaoNewsInfiniteScrollBundle\ContaoManager;
 
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
+use Markocupic\ResourceBookingBundle\DependencyInjection\Compiler\AddSessionBagsPass;
+use Symfony\Component\Config\Loader\LoaderInterface;
 
 /**
  * Plugin for the Contao Manager.
@@ -24,6 +25,19 @@ use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
  */
 class Plugin implements BundlePluginInterface
 {
+
+    /**
+     * @param LoaderInterface $loader
+     * @param array $managerConfig
+     * @throws \Exception
+     */
+    public function registerContainerConfiguration(LoaderInterface $loader, array $managerConfig)
+    {
+        $loader->load(__DIR__ . '/../Resources/config/parameters.yml');
+        $loader->load(__DIR__ . '/../Resources/config/listener.yml');
+        $loader->load(__DIR__ . '/../Resources/config/services.yml');
+    }
+
     /**
      * {@inheritdoc}
      */

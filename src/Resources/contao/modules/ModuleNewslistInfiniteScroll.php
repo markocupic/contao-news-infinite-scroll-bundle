@@ -32,7 +32,7 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
      */
     public function generate()
     {
-        if (TL_MODE == 'BE')
+        if (TL_MODE === 'BE')
         {
             $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['contao_news_infinite_scroll'][0]) . ' ###';
@@ -57,7 +57,6 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
         return parent::generate();
     }
 
-
     /**
      * Generate the module
      */
@@ -67,7 +66,6 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
 
         // Add Css Class
         $this->Template->cssID[1] = $this->Template->cssID[1] == '' ? 'ajaxCall' : $this->Template->cssID[1] . ' ajaxCall';
-
 
         if (Environment::get('isAjaxRequest'))
         {

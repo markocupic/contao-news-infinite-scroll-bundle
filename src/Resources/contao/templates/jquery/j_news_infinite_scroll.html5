@@ -12,8 +12,12 @@
                 newsContainer: '.mod_newslist_infinite_scroll',
                 // CSS selector: Default to $(window)
                 scrollContainer: $(window),
-                // CSS selector: Pagination links (<a href="infinite?page_n193=5" class="link page-link" title="Gehe zu Seite 5">5</a>)
-                paginationLinks: '.pagination .link',
+                // CSS selector: Pagination next  (<ul class="pagination"><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul>)
+                paginationNextLink: '.pagination > .next > a.next',
+                // CSS selector: Pagination last  (<ul class="pagination"><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul>)
+                paginationLastLink: '.pagination > .last > a.last',
+                // Pagination url regex pattern
+                paginationUrlRegexPattern: 'page_n(\\d*)=(\\d*)',
                 // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
                 loadAllOnDomready: false,
                 // Use a "load more button" (Preserve the accessibility of the footer)
@@ -38,9 +42,9 @@
                  * @return bool
                  */
                 onInitialize: function (instance) {
-                    //$('.mod_portfoliolist').addClass('row');
-                    //$('.mod_portfoliolist  > div').addClass('col-md-3');
+                    // Hide pagination
                     $('.mod_newslist_infinite_scroll .pagination').hide();
+
                     // Return false to abort initialization
                     return true;
                 },
@@ -69,7 +73,7 @@
                  * @param instance
                  */
                 onXHRFail: function (instance) {
-                    console.log('No response from server with address: ' + instance.currentUrl);
+                    console.error('No response from server with address: ' + instance.currentUrl);
                 },
 
                 /**

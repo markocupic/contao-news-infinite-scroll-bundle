@@ -20,8 +20,12 @@
             newsContainer: '.mod_newslist_infinite_scroll',
             // CSS selector: Default to $(window)
             scrollContainer: $(window),
-            // CSS selector: Pagination links (<a href="infinite?page_n193=5" class="link page-link" title="Gehe zu Seite 5">5</a>)
-            paginationLinks: '.pagination .link',
+            // CSS selector: Pagination next  (<ul class="pagination"><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul>)
+            paginationNextLink: '.pagination > .next > a.next',
+            // CSS selector: Pagination last  (<ul class="pagination"><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul>)
+            paginationLastLink: '.pagination > .last > a.last',
+            // Pagination url regex pattern
+            paginationUrlRegexPattern: 'page_n(\\d*)=(\\d*)',
             // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
             loadAllOnDomready: false,
             // Use a "load more button"
@@ -102,15 +106,54 @@
             if (typeof _newsContainer === 'undefined') {
                 return;
             }
-            // Get urls from pagination
-            $(_opts.newsContainer + ' ' + _opts.paginationLinks).each(function () {
-                _arrUrls.push($(this).prop('href'));
-            });
+
+            // If there is no pagination, there are no news items to load
+            if ($(_opts.newsContainer + ' ' + _opts.paginationNextLink).length === 0) {
+                // Skip initialization process
+                return;
+            }
+
+            // Get request urls from pagination links
+            if ($(_opts.newsContainer + ' ' + _opts.paginationNextLink).length) {
+                // get first request url
+                let next = $(_opts.newsContainer + ' ' + _opts.paginationNextLink).first();
+                let hrefNext = $(next).prop('href');
+                // page_n(\\d*)=(\\d*)/g;
+                let regexpNext = new RegExp(_opts.paginationUrlRegexPattern, "g");
+                let matchNext = regexpNext.exec(hrefNext);
+                if (!matchNext) {
+                    console.error('News infinite scroll initialization aborted! Could not find pagination link with pattern "' + _opts.paginationUrlRegexPattern + '".');
+                    // Skip initialization process
+                    return;
+                }
+                let idNext = matchNext[2];
+                let idLast = idNext;
+
+                // if the next url is same to last url there is no last url
+                if ($(_opts.newsContainer + ' ' + _opts.paginationLastLink).length > 0) {
+                    // get last request url
+                    let last = $(_opts.newsContainer + ' ' + _opts.paginationLastLink).first();
+                    let hrefLast = $(last).prop('href');
+                    let regexpLast = new RegExp(_opts.paginationUrlRegexPattern, "g");
+                    let matchLast = regexpLast.exec(hrefLast);
+                    if (matchLast) {
+                        // Overwrite idLast
+                        idLast = matchLast[2];
+                    }
+                }
+
+                // Generate all urls from first and last
+                for (i = idNext; i <= idLast; i++) {
+                    let url = hrefNext.replace('page_n' + matchNext[1] + '=' + matchNext[2], 'page_n' + matchNext[1] + '=' + i);
+                    _arrUrls.push(url);
+                }
+            }
+
 
             // scrollContainer
             _scrollContainer = $(_opts.scrollContainer)[0];
             if (typeof _scrollContainer === 'undefined') {
-                console.log('ContaoNewsInfiniteScroll aborted! Please select a valid scroll container.');
+                console.error('ContaoNewsInfiniteScroll aborted! Please select a valid scroll container.');
                 return;
             }
 
@@ -204,8 +247,10 @@
                             _blnLoadedAllItems = 1;
 
                             // Remove the loadMoreButton
-                            _self.loadMoreBtn.remove();
-                            _self.loadMoreBtn = null;
+                            if ($(_self.loadMoreBtn).length) {
+                                _self.loadMoreBtn.remove();
+                                _self.loadMoreBtn = null;
+                            }
 
                             // Clear the autoloadInterval
                             if (typeof _xhrInterval !== 'undefined') {
