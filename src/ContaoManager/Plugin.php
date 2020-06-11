@@ -15,6 +15,7 @@ namespace Markocupic\ContaoNewsInfiniteScrollBundle\ContaoManager;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
+use Contao\ManagerPlugin\Config\ConfigPluginInterface;
 use Markocupic\ResourceBookingBundle\DependencyInjection\Compiler\AddSessionBagsPass;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
@@ -23,7 +24,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
  *
  * @author Marko Cupic
  */
-class Plugin implements BundlePluginInterface
+class Plugin implements BundlePluginInterface, ConfigPluginInterface
 {
 
     /**
