@@ -147,7 +147,6 @@
                 for (i = idNext; i <= idLast; i++) {
                     let url = hrefNext.replace(regexpNext, 'page_n$1=' + i);
                     _arrUrls.push(url);
-                    console.log(url);
                 }
             }
 
