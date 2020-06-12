@@ -45,10 +45,10 @@
             },
             onXHRStart: function (instance) {
             },
-            onXHRComplete: function (response, instance) {
+            onXHRComplete: function (response, instance, xhr) {
                 return response;
             },
-            onXHRFail: function (instance) {
+            onXHRFail: function (instance, xhr) {
             },
             onBeforeAppendCallback: function (instance, xhr) {
             },
