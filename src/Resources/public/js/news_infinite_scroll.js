@@ -20,27 +20,25 @@
             newsContainer: '.mod_newslist_infinite_scroll',
             // CSS selector: Default to $(window)
             scrollContainer: $(window),
-            // CSS selector: Pagination next  (<ul class="pagination"><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul>)
-            paginationNextLink: '.pagination > .next > a.next',
-            // CSS selector: Pagination last  (<ul class="pagination"><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul>)
-            paginationLastLink: '.pagination > .last > a.last',
-            // Pagination url regex pattern
-            paginationUrlRegexPattern: 'page_n(\\d*)=(\\d*)',
+            // CSS selector: Pagination next  (<nav class="pagination block"><ul><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul></nav>)
+            paginationNextLink: '.pagination .next > a.next',
+            // CSS selector: Pagination last  (<nav class="pagination block"><ul><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul></nav>)
+            paginationLastLink: '.pagination .last > a.last',
             // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
             loadAllOnDomready: false,
-            // Use a "load more button"
+            // Use a "load more button" (Preserve the accessibility of the footer)
+            // !!!! Important Set loadMoreButton to false, if you want to autoload items
             loadMoreButton: true,
-            // Load more button
-            loadMoreButtonMarkup: '<div><button>Load more</button></div>',
+            // Load more button markup
+            loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container text-center"><button class="btn btn-primary w-100"><?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadMore"] ?></button></div>',
             // CSS selector: When you scroll and the window has reached the anchor point, requests will start
             anchorPoint: '.mod_newslist_infinite_scroll',
             // Distance in px from the top of the anchorPoint
-            bottomPixels: 0,
-            // Integer: Fading time for loades news items
-            fadeInTime: 800,
+            bottomPixels: 100,
+            // Integer: Fading time for appending news items
+            fadeInTime: 400,
             // HTML: Show this message during the loading process
-            loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container"><em>Loading...</em></div>',
-
+            loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container text-center"><i class="fa fa-5x fa-spinner fa-spin"></i>{{br}}{{br}}<?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadingInProcess"] ?>...</em></div>',
 
             // Callbacks
             onInitialize: function (instance) {
@@ -52,7 +50,9 @@
             },
             onXHRFail: function (instance) {
             },
-            onAppendCallback: function (instance) {
+            onBeforeAppendCallback: function (instance, xhr) {
+            },
+            onAppendCallback: function (instance, xhr) {
             }
         }, options || {});
 
@@ -73,6 +73,7 @@
         _self.urlIndex = 0;
         _self.response = '';
         _self.loadMoreBtn = null;
+        _self.xhr = null;
 
 
         /** Public Methods **/
@@ -96,7 +97,7 @@
          * Init function
          */
         let _initialize = function () {
-            // Call onInitialize-callback
+            // Trigger onInitialize-callback
             if (_opts.onInitialize(_self) !== true) {
                 return;
             }
@@ -119,10 +120,11 @@
                 let next = $(_opts.newsContainer + ' ' + _opts.paginationNextLink).first();
                 let hrefNext = $(next).prop('href');
                 // page_n(\\d*)=(\\d*)/g;
-                let regexpNext = new RegExp(_opts.paginationUrlRegexPattern, "g");
+                let paginationUrlRegexPattern = 'page_n(\\d*)=(\\d*)';
+                let regexpNext = new RegExp(paginationUrlRegexPattern, "g");
                 let matchNext = regexpNext.exec(hrefNext);
                 if (!matchNext) {
-                    console.error('News infinite scroll initialization aborted! Could not find pagination link with pattern "' + _opts.paginationUrlRegexPattern + '".');
+                    console.error('News infinite scroll initialization aborted! Could not find pagination link with pattern "' + paginationUrlRegexPattern + '".');
                     // Skip initialization process
                     return;
                 }
@@ -136,7 +138,7 @@
                     let last = $(_opts.newsContainer + ' ' + _opts.paginationLastLink).first();
                     let hrefLast = $(last).prop('href');
                     // page_n(\\d*)=(\\d*)/g;
-                    let regexpLast = new RegExp(_opts.paginationUrlRegexPattern, "g");
+                    let regexpLast = new RegExp(paginationUrlRegexPattern, "g");
                     let matchLast = regexpLast.exec(hrefLast);
                     if (matchLast) {
                         // Overwrite idLast
@@ -202,13 +204,12 @@
             if (_blnLoadingInProcess == 1 || _blnLoadedAllItems == 1) return;
             _self.blnHasError = false;
 
-
             _self.currentUrl = _arrUrls[_self.urlIndex];
             if (typeof _self.currentUrl !== 'undefined') {
-                $.ajax({
+                _self.xhr = $.ajax({
                     url: _self.currentUrl,
                     beforeSend: function () {
-                        // Call onXHRStart-Callback
+                        // Trigger onXHRStart-Callback
                         _opts.onXHRStart(_self);
 
                         // Set aria-busy propery to true
@@ -223,11 +224,14 @@
                 }).done(function (data) {
                     _self.blnHasError = false;
                     _self.response = data;
-                    let html = _opts.onXHRComplete(_self.response, _self);
+
+                    // Trigger onXHRComplete
+                    _self.response = _opts.onXHRComplete(_self.response, _self, _self.xhr);
+
                     if (_self.blnHasError === false) {
                         _self.urlIndex++;
                         setTimeout(function () {
-                            _appendToDom(html);
+                            _appendToDom();
                         }, 1000);
                     } else {
                         _fail();
@@ -280,21 +284,30 @@
         let _fail = function () {
 
             _blnLoadingInProcess = 0;
-            // Call onXHRFail-callback
-            _opts.onXHRFail(_self);
+            // Trigger onXHRFail-callback
+            _opts.onXHRFail(_self, _self.xhr);
         };
 
         /**
-         * Append items to DOM
+         *
          * @param html
+         * @param xhr
+         * @private
          */
-        let _appendToDom = function (html) {
-            // Append html to dom and fade in
-            $(html).hide().appendTo(_newsContainer).fadeIn(_opts.fadeInTime);
+        let _appendToDom = function () {
 
-            // Call onAppendCallback-callback
-            _opts.onAppendCallback(_self);
-        }
+            // Trigger onBeforeAppendCallback
+            _opts.onBeforeAppendCallback(_self, _self.xhr);
+
+            if (_self.response != '') {
+                // Append html to dom and fade in
+                $(_self.response).hide().appendTo(_newsContainer).fadeIn(_opts.fadeInTime);
+            }
+
+            // Trigger onAppendCallback
+            _opts.onAppendCallback(_self, _self.xhr);
+        };
+
         // Start procedure
         _initialize();
     };
