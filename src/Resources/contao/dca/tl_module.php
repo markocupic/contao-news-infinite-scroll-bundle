@@ -25,9 +25,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['newsInfiniteScroll_addCanonicalTag'] 
 ];
 
 /**
+ * Class tl_module_contao_news_infinite_scroll
  * Provide miscellaneous methods that are used by the data configuration array.
- *
- * @author Marko Cupic <https://github.com/markocupic>
  */
 class tl_module_contao_news_infinite_scroll extends \Contao\Backend
 {
@@ -37,16 +36,19 @@ class tl_module_contao_news_infinite_scroll extends \Contao\Backend
      */
     public function __construct()
     {
+
         parent::__construct();
         $this->import('BackendUser', 'User');
     }
 
     /**
      * Show a hint if a JavaScript library needs to be included in the page layout
+     *
      * @param object
      */
     public function showJsLibraryHint($dc)
     {
+
         if ($_POST || Input::get('act') != 'edit')
         {
             return;
@@ -73,10 +75,12 @@ class tl_module_contao_news_infinite_scroll extends \Contao\Backend
 
     /**
      * Add dca fields to palette
+     *
      * @param $dc
      */
     public function addFieldsToPalette($dc)
     {
+
         $objMod = \Contao\ModuleModel::findByPk($dc->id);
 
         if ($objMod === null)
@@ -99,6 +103,7 @@ class tl_module_contao_news_infinite_scroll extends \Contao\Backend
      */
     public function setPalette()
     {
+
         $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist_infinite_scroll'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'];
     }
 
