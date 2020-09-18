@@ -20,11 +20,11 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
- * Class MarkoCupicContaoNewsInfiniteScrollExtension
+ * Class MarkocupicContaoNewsInfiniteScrollExtension
  *
  * @package Markocupic\ContaoNewsInfiniteScrollBundle\DependencyInjection
  */
-class MarkoCupicContaoNewsInfiniteScrollExtension extends Extension
+class MarkocupicContaoNewsInfiniteScrollExtension extends Extension
 {
     /**
      * @param array $configs
