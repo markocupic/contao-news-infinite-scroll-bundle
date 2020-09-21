@@ -15,25 +15,37 @@ namespace Markocupic\ContaoNewsInfiniteScrollBundle\ContaoManager;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
-use SomeVendor\ContaoExampleBundle\ContaoExampleBundle;
+use Contao\ManagerPlugin\Config\ConfigPluginInterface;
+use Markocupic\ResourceBookingBundle\DependencyInjection\Compiler\AddSessionBagsPass;
+use Symfony\Component\Config\Loader\LoaderInterface;
 
 /**
- * Class Plugin
+ * Plugin for the Contao Manager.
  *
- * @package Markocupic\ContaoNewsInfiniteScrollBundle\ContaoManager
+ * @author Marko Cupic
  */
-class Plugin implements BundlePluginInterface
+class Plugin implements BundlePluginInterface, ConfigPluginInterface
 {
-    /**
-     * @param ParserInterface $parser
-     * @return array
-     */
-    public function getBundles(ParserInterface $parser): array
-    {
 
+    /**
+     * @param LoaderInterface $loader
+     * @param array $managerConfig
+     * @throws \Exception
+     */
+    public function registerContainerConfiguration(LoaderInterface $loader, array $managerConfig)
+    {
+        $loader->load(__DIR__ . '/../Resources/config/listener.yml');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBundles(ParserInterface $parser)
+    {
         return [
             BundleConfig::create('Markocupic\ContaoNewsInfiniteScrollBundle\MarkocupicContaoNewsInfiniteScrollBundle')
                 ->setLoadAfter([
+                    'Contao\CoreBundle\ContaoCoreBundle',
                     'Contao\NewsBundle\ContaoNewsBundle',
                 ]),
         ];

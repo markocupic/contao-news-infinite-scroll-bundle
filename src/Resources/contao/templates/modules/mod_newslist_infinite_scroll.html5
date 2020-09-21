@@ -1,6 +1,16 @@
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+
 <?php if (empty($this->articles)): ?>
 <p class="empty"><?= $this->empty ?></p>
 <?php else: ?>
-<?= implode('', $this->articles) ?>
+<div v-html="articles" class="infiniteScrollNewslistArticlesContainer row tiny-gutter"></div>
+
+<div style="display:none">
 <?= $this->pagination ?>
+</div>
+
 <?php endif; ?>
+
+<?php $this->endblock(); ?>

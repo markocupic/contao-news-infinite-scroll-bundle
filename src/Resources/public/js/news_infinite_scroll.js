@@ -66,6 +66,7 @@
         let _arrUrls = [];
         let _blnLoadedAllItems = 0;
         let _xhrInterval = 0;
+        let _vueApp = null;
 
         // Public variables
         _self.blnHasError = false;
@@ -107,6 +108,53 @@
             if (typeof _newsContainer === 'undefined') {
                 return;
             }
+
+
+            let appId = $(_newsContainer).prop('id');
+
+            if (!$(_newsContainer).prop('id')) {
+                console.error('No id defined for the newslist container. Please add a css id to the news_infinite_list module in the contao backend.')
+                return;
+            }
+
+            let vueData = {
+                data() {
+                    return {
+                        articles: '',
+                    };
+                },
+                created() {
+                    let self = this;
+                    console.log(window.location.href);
+                    fetch(window.location.href, {
+                            headers: {
+                                'x-requested-with': 'XMLHttpRequest'
+                            }
+                        }
+                        )
+                        .then(
+                            function(response) {
+                                if (response.status !== 200) {
+                                    console.log('Looks like there was a problem. Status Code: ' +
+                                        response.status);
+                                    return;
+                                }
+
+                                // Examine the text in the response
+                                response.json().then(function(data) {
+                                    //console.log(self.articles);
+                                    self.articles = data.data;
+                                });
+                            }
+                        )
+                        .catch(function(err) {
+                            console.log('Fetch Error :-S', err);
+                        });
+                }
+            }
+
+
+            this._vueApp = Vue.createApp(vueData).mount('#' + appId);
 
             // If there is no pagination, there are no news items to load
             if ($(_opts.newsContainer + ' ' + _opts.paginationNextLink).length === 0) {
@@ -301,7 +349,8 @@
 
             if (_self.response != '') {
                 // Append html to dom and fade in
-                $(_self.response).hide().appendTo(_newsContainer).fadeIn(_opts.fadeInTime);
+                let res = JSON.parse(_self.response);
+                this._vueApp.articles = this._vueApp.articles + res.data;
             }
 
             // Trigger onAppendCallback

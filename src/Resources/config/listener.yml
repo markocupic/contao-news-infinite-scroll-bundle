@@ -7,3 +7,8 @@ services:
     tags:
     - { name: kernel.event_listener, event: contao.parse_articles, method: addCanonicalTag }
 
+  # Contao add parse template hook
+  Markocupic\ContaoNewsInfiniteScrollBundle\EventListener\Contao\ParseTemplateListener:
+    public: true
+    tags:
+      - { name: kernel.event_listener, event: contao.parse_template, method: addId }

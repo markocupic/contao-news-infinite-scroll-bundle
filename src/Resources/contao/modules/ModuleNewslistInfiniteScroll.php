@@ -73,12 +73,10 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
 
         if (Environment::get('isAjaxRequest'))
         {
-            $this->Template->headline = '';
-            $this->Template->pagination = '';
-            $this->Template->archives = $this->news_archives;
-
-            echo implode('', $this->Template->articles);
-            //$this->Template->output();
+            $this->Template->isAjax = true;
+            $arrJson = [];
+            $arrJson['data'] = implode('', $this->Template->articles);
+            echo json_encode($arrJson);
             exit();
         }
     }
