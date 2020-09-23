@@ -1,5 +1,4 @@
 <script src="https://unpkg.com/vue@next"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.0/vue.cjs.js"></script>
 
 <script>
     (function ($) {
@@ -10,7 +9,7 @@
              * @type {ContaoNewsInfiniteScroll}
              */
             var contaoNewsInfiniteScroll = new ContaoNewsInfiniteScroll({
-                // CSS selector: Append loaded items to this container
+                // CSS selector: Define the parent news list container css selector
                 newsContainer: '.mod_newslist_infinite_scroll',
                 // CSS selector: Default to $(window)
                 scrollContainer: $(window),
@@ -21,10 +20,8 @@
                 // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
                 loadAllOnDomready: false,
                 // Use a "load more button" (Preserve the accessibility of the footer)
-                // !!!! Important Set loadMoreButton to false, if you want to autoload items
-                loadMoreButton: true,
-                // Load more button markup
-                loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container text-center"><button class="btn btn-primary w-100"><?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadMore"] ?></button></div>',
+                // !!!! Important Set showLoadMoreButton to false, if you want to autoload items
+                showLoadMoreButton: true,
                 // CSS selector: When you scroll and the window has reached the anchor point, requests will start
                 anchorPoint: '.mod_newslist_infinite_scroll',
                 // Distance in px from the top of the anchorPoint
@@ -37,7 +34,6 @@
 
                 // Callbacks
                 /**
-                 *
                  * @param instance
                  * @return bool
                  */
@@ -50,7 +46,6 @@
                 },
 
                 /**
-                 *
                  * @param instance
                  */
                 onXHRStart: function (instance) {
@@ -58,7 +53,6 @@
                 },
 
                 /**
-                 *
                  * @param html
                  * @param instance
                  * @param xhr
@@ -70,7 +64,6 @@
                 },
 
                 /**
-                 *
                  * @param instance
                  * @param xhr
                  */
@@ -80,7 +73,6 @@
                 },
 
                 /**
-                 *
                  * @param instance
                  * @param xhr
                  */
@@ -92,7 +84,6 @@
                 },
 
                 /**
-                 *
                  * @param instance
                  * @param xhr
                  */
