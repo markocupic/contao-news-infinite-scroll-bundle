@@ -12,7 +12,7 @@
     <?= $this->trans("MSC.infScrLoadingInProcess") ?>
 </div>
 
-<div v-if="showLoadMoreButton === true" class="inf-scr-load-more-btn-container text-center">
+<div v-if="showLoadMoreButton === true" class="inf-scr-load-more-btn-container text-center mt-4">
     <button v-on:click="load" class="btn btn-primary w-100"><?= $this->trans("MSC.infScrLoadMore") ?></button>
 </div>
 

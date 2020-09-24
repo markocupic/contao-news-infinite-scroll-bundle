@@ -99,11 +99,12 @@
             /** Private Methods **/
 
             /**
-             * Init function
-             *
+             * Initialize application
+             * @returns {Promise<void>}
              * @private
              */
-            let _initialize = async function () {
+            const _initialize = async function () {
+
                 // Trigger onInitialize-callback
                 if (_opts.onInitialize(_self) !== true) {
                     return;
@@ -115,7 +116,6 @@
                     return;
                 }
 
-
                 // If there is no pagination, there are no news items to load
                 if ($(_opts.newsContainer + ' ' + _opts.paginationNextLink).length === 0) {
                     // Skip initialization process
@@ -125,12 +125,12 @@
                 // Get request urls from pagination links
                 if ($(_opts.newsContainer + ' ' + _opts.paginationNextLink).length) {
                     // get first request url
-                    let next = $(_opts.newsContainer + ' ' + _opts.paginationNextLink).first();
-                    let hrefNext = $(next).prop('href');
+                    const next = $(_opts.newsContainer + ' ' + _opts.paginationNextLink).first();
+                    const hrefNext = $(next).prop('href');
                     // page_n(\\d*)=(\\d*)/g;
-                    let paginationUrlRegexPattern = 'page_n(\\d*)=(\\d*)';
-                    let regexpNext = new RegExp(paginationUrlRegexPattern, "g");
-                    let matchNext = regexpNext.exec(hrefNext);
+                    const paginationUrlRegexPattern = 'page_n(\\d*)=(\\d*)';
+                    const regexpNext = new RegExp(paginationUrlRegexPattern, "g");
+                    const matchNext = regexpNext.exec(hrefNext);
                     if (!matchNext) {
                         console.error('News infinite scroll initialization aborted! Could not find pagination link with pattern ' +
                             '"' + paginationUrlRegexPattern + '".'
@@ -138,18 +138,18 @@
                         // Skip initialization process
                         return;
                     }
-                    let idModule = matchNext[1]
-                    let idNext = matchNext[2];
+                    const idModule = matchNext[1];
+                    const idNext = matchNext[2];
                     let idLast = idNext;
 
                     // if the next url is same to last url there is no last url
                     if ($(_opts.newsContainer + ' ' + _opts.paginationLastLink).length > 0) {
                         // get last request url
-                        let last = $(_opts.newsContainer + ' ' + _opts.paginationLastLink).first();
-                        let hrefLast = $(last).prop('href');
+                        const last = $(_opts.newsContainer + ' ' + _opts.paginationLastLink).first();
+                        const hrefLast = $(last).prop('href');
                         // page_n(\\d*)=(\\d*)/g;
-                        let regexpLast = new RegExp(paginationUrlRegexPattern, "g");
-                        let matchLast = regexpLast.exec(hrefLast);
+                        const regexpLast = new RegExp(paginationUrlRegexPattern, "g");
+                        const matchLast = regexpLast.exec(hrefLast);
                         if (matchLast) {
                             // Overwrite idLast
                             idLast = matchLast[2];
@@ -158,7 +158,7 @@
 
                     // Generate all urls from first to last
                     for (i = idNext; i <= idLast; i++) {
-                        let url = hrefNext.replace(regexpNext, 'page_n' + idModule + '=' + i);
+                        const url = hrefNext.replace(regexpNext, 'page_n' + idModule + '=' + i);
                         _arrUrls.push(url);
                     }
                 }
@@ -171,7 +171,7 @@
                 }
 
                 // Bottom Pixels
-                if (_opts.bottomPixels == 0) {
+                if (_opts.bottomPixels === 0) {
                     _opts.bottomPixels = 1;
                 }
 
@@ -181,15 +181,12 @@
                     _anchorPoint = $(_opts.anchorPoint)[0];
                 }
 
-
+                // Instantiate the vue container
                 const vueInit = await _vueInit();
-                const fetch = await _fetch(window.location.href);
-                const rest = await _rest();
 
+                // Call initial request
+                const fetch = await _load(true);
 
-            };
-
-            let _rest = async function () {
                 // Load elements on domready or load them when scrolling to the bottom
                 if (_opts.loadAllOnDomready === true) {
                     _load();
@@ -202,16 +199,18 @@
                         }
                     });
                 }
+
+
             };
 
 
             /**
-             *
-             * @returns {{blnLoadingInProcess: boolean, articles: string}}
+             * Initialize vue.js app
+             * @returns {Promise<{blnLoadingInProcess: boolean, showLoadMoreButton: boolean, articles: string}>}
              * @private
              */
-            let _vueInit = async function () {
-                let appId = $(_newsContainer).prop('id');
+            const _vueInit = async function () {
+                const appId = $(_newsContainer).prop('id');
 
                 if (!appId) {
                     console.error(
@@ -242,10 +241,11 @@
 
             /**
              * Prepare fetch
-             *
+             * @param initialReq
+             * @returns {Promise<void>}
              * @private
              */
-            let _load = function () {
+            const _load = async function (initialReq = false) {
 
                 if (_vueModel.blnLoadingInProcess === true || _blnLoadedAllItems === true) {
                     return;
@@ -253,95 +253,112 @@
                 _self.blnHasError = false;
 
                 _self.currentUrl = _arrUrls[_self.urlIndex];
-                if (typeof _self.currentUrl !== 'undefined') {
-                    _fetch(_self.currentUrl);
-                } else {
-                    _blnLoadedAllItems = true;
-                    if (typeof _xhrInterval !== 'undefined') {
-                        clearInterval(_xhrInterval);
-                    }
+                if (initialReq === true) {
+                    _self.currentUrl = window.location.href;
                 }
-            };
 
-            /**
-             * Fetch data
-             *
-             * @param url
-             * @returns {Promise<void>}
-             * @private
-             */
-            let _fetch = async function (url) {
-                _self.xhr = $.ajax({
-                    url: url,
-                    beforeSend: function () {
-                        // Trigger onXHRStart-Callback
-                        _opts.onXHRStart(_self);
+                if (typeof _self.currentUrl === 'undefined') {
+                    throw new Error('Invalid url.')
+                }
 
-                        // Set aria-busy property to true
-                        $(_newsContainer).attr('aria-busy', 'true');
+                const response = await _fetch(_self.currentUrl);
 
-                        _vueModel.blnLoadingInProcess = true;
-                        _vueModel.showLoadMoreButton = false;
+                _self.blnHasError = false;
 
-                    }
-                }).done(function (data) {
-                    _self.blnHasError = false;
-                    _self.response = data;
+                // Trigger onXHRComplete
+                _self.response = _opts.onXHRComplete(response, _self, _self.xhr);
 
-                    // Trigger onXHRComplete
-                    _self.response = _opts.onXHRComplete(_self.response, _self, _self.xhr);
+                _self.urlIndex++;
 
-                    if (_self.blnHasError === false) {
-                        _self.urlIndex++;
-                        setTimeout(function () {
+                new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, 1000); // resolve after 1 second
+                }).then((result) => {
 
-                            // If all items are loaded...
-                            if (_arrUrls.length == _self.urlIndex) {
-                                // Set _blnLoadedAllItems to true
-                                _blnLoadedAllItems = true;
-                                if (_opts.showLoadMoreButton === true) {
-                                    _vueModel.showLoadMoreButton = false;
-                                }
+                    // If all items are loaded...
+                    if (_arrUrls.length <= _self.urlIndex) {
 
-                                // Clear the autoloadInterval
-                                if (typeof _xhrInterval !== 'undefined') {
-                                    clearInterval(_xhrInterval);
-                                }
-                            } else {
-                                if (_opts.showLoadMoreButton === true) {
-                                    _vueModel.showLoadMoreButton = true;
-                                }
-                            }
-                            _appendToDom();
-                        }, 1000);
+                        // Set _blnLoadedAllItems to true
+                        _blnLoadedAllItems = true;
+
+                        if (_opts.showLoadMoreButton === true) {
+                            _vueModel.showLoadMoreButton = false;
+                        }
+
+                        // Clear the autoloadInterval
+                        if (typeof _xhrInterval !== 'undefined') {
+                            clearInterval(_xhrInterval);
+                        }
+
                     } else {
-                        _fail();
+
+                        if (_opts.showLoadMoreButton === true) {
+                            _vueModel.showLoadMoreButton = true;
+                        }
+
                     }
-                }).fail(function () {
-                    _fail();
-                }).always(function () {
+                    _vueModel.blnLoadingInProcess = false;
 
+                    _appendToDom();
 
-                    setTimeout(function () {
-
-                        // Set aria-busy propery to false
-                        $(_newsContainer).attr('aria-busy', 'false');
-
-
-                        _vueModel.blnLoadingInProcess = false
-                    }, 1000);
                 });
 
             };
 
+
             /**
-             * Fail method
-             *
+             * Fetch data from server
+             * @param url
+             * @returns {Promise<any>}
              * @private
              */
-            let _fail = function () {
+            const _fetch = async function (url) {
+                try {
+                    // Trigger onXHRStart-Callback
+                    const onXhrStart = await _opts.onXHRStart(_self);
+
+                    // Set aria-busy property to true
+                    $(_newsContainer).attr('aria-busy', 'true');
+
+                    _vueModel.blnLoadingInProcess = true;
+                    _vueModel.showLoadMoreButton = false;
+
+                    _self.xhr = await fetch(url, {
+                        headers: {
+                            'x-requested-with': 'XMLHttpRequest'
+                        }
+                    });
+
+                    // Handle errors
+                    if (!_self.xhr.ok) {
+                        _fail();
+                        throw new Error(`An error has occured: ${_self.xhr.status}`);
+                    }
+
+                    const data = await _self.xhr.json();
+
+                    $(_newsContainer).attr('aria-busy', 'false');
+
+                    return data;
+
+                } catch (error) {
+                    throw new Error('An error occured, while using fetch.');
+                }
+
+            };
+
+            /**
+             * Fail-method
+             * @private
+             */
+            const _fail = function () {
 
                 _vueModel.blnLoadingInProcess = false;
+
+                // Set aria-busy property to false
+                $(_newsContainer).attr('aria-busy', 'false');
+
                 // Trigger onXHRFail-callback
                 _opts.onXHRFail(_self, _self.xhr);
             };
@@ -350,15 +367,14 @@
              * Append loaded articles to DOM
              * @private
              */
-            let _appendToDom = function () {
+            const _appendToDom = function () {
 
                 // Trigger onBeforeAppendCallback
                 _opts.onBeforeAppendCallback(_self, _self.xhr);
 
-                if (_self.response != '') {
-                    // Append html to dom and fade in
-                    let res = JSON.parse(_self.response);
-                    _vueModel.articles = _vueModel.articles + res.data;
+                if (_self.response.data != '') {
+                    // Append html to dom
+                    _vueModel.articles = _vueModel.articles + _self.response.data;
                 }
 
                 // Trigger onAppendCallback
