@@ -11,8 +11,8 @@
             var contaoNewsInfiniteScroll = new ContaoNewsInfiniteScroll({
                 // CSS selector: Define the parent news list container css selector
                 newsContainer: '.mod_newslist_infinite_scroll',
-                // CSS selector: Default to $(window)
-                scrollContainer: $(window),
+                // CSS selector: Default to window
+                scrollContainer: window,
                 // CSS selector: Pagination next  (<nav class="pagination block"><ul><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul></nav>)
                 paginationNextLink: '.pagination .next > a.next',
                 // CSS selector: Pagination last  (<nav class="pagination block"><ul><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul></nav>)

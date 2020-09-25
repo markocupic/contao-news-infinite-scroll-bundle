@@ -18,8 +18,8 @@
 
                 // CSS selector: Define the parent news list container css selector
                 newsContainer: '.mod_newslist_infinite_scroll',
-                // CSS selector: Default to $(window)
-                scrollContainer: $(window),
+                // CSS selector: Default to window
+                scrollContainer: window,
                 // CSS selector: Pagination next  (<nav class="pagination block"><ul><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul></nav>)
                 paginationNextLink: '.pagination .next > a.next',
                 // CSS selector: Pagination last  (<nav class="pagination block"><ul><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul></nav>)
@@ -111,30 +111,30 @@
                 }
 
                 // newsContainer
-                _newsContainer = $(_opts.newsContainer)[0];
-                if (typeof _newsContainer === 'undefined') {
+                _newsContainer = document.querySelector(_opts.newsContainer);
+                if (!_newsContainer) {
                     return;
                 }
 
                 // If there is no pagination, there are no news items to load
-                if ($(_opts.newsContainer + ' ' + _opts.paginationNextLink).length === 0) {
+                if (!document.querySelector(_opts.newsContainer + ' ' + _opts.paginationNextLink)) {
                     // Skip initialization process
                     return;
                 }
 
                 // Get request urls from pagination links
-                if ($(_opts.newsContainer + ' ' + _opts.paginationNextLink).length) {
+                if (document.querySelector(_opts.newsContainer + ' ' + _opts.paginationNextLink)) {
                     // get first request url
-                    const next = $(_opts.newsContainer + ' ' + _opts.paginationNextLink).first();
-                    const hrefNext = $(next).prop('href');
+                    const next = document.querySelector(_opts.newsContainer + ' ' + _opts.paginationNextLink);
+                    const hrefNext = next.getAttribute('href');
+
                     // page_n(\\d*)=(\\d*)/g;
                     const paginationUrlRegexPattern = 'page_n(\\d*)=(\\d*)';
                     const regexpNext = new RegExp(paginationUrlRegexPattern, "g");
+
                     const matchNext = regexpNext.exec(hrefNext);
                     if (!matchNext) {
-                        console.error('News infinite scroll initialization aborted! Could not find pagination link with pattern ' +
-                            '"' + paginationUrlRegexPattern + '".'
-                        );
+                        console.error(`News infinite scroll initialization aborted! Could not find pagination link with pattern ${paginationUrlRegexPattern}.`);
                         // Skip initialization process
                         return;
                     }
@@ -143,10 +143,10 @@
                     let idLast = idNext;
 
                     // if the next url is same to last url there is no last url
-                    if ($(_opts.newsContainer + ' ' + _opts.paginationLastLink).length > 0) {
+                    if (document.querySelector(_opts.newsContainer + ' ' + _opts.paginationLastLink)) {
                         // get last request url
-                        const last = $(_opts.newsContainer + ' ' + _opts.paginationLastLink).first();
-                        const hrefLast = $(last).prop('href');
+                        const last = document.querySelector(_opts.newsContainer + ' ' + _opts.paginationLastLink);
+                        const hrefLast = last.getAttribute('href');
                         // page_n(\\d*)=(\\d*)/g;
                         const regexpLast = new RegExp(paginationUrlRegexPattern, "g");
                         const matchLast = regexpLast.exec(hrefLast);
@@ -157,6 +157,7 @@
                     }
 
                     // Generate all urls from first to last
+                    let i;
                     for (i = idNext; i <= idLast; i++) {
                         const url = hrefNext.replace(regexpNext, 'page_n' + idModule + '=' + i);
                         _arrUrls.push(url);
@@ -164,8 +165,8 @@
                 }
 
                 // scrollContainer
-                _scrollContainer = $(_opts.scrollContainer)[0];
-                if (typeof _scrollContainer === 'undefined') {
+                _scrollContainer = _opts.scrollContainer;
+                if (!_scrollContainer) {
                     console.error('ContaoNewsInfiniteScroll aborted! Please select a valid scroll container.');
                     return;
                 }
@@ -176,31 +177,30 @@
                 }
 
                 // anchor points settings
-                _anchorPoint = $(_newsContainer);
-                if (typeof $(_opts.anchorPoint)[0] !== 'undefined') {
-                    _anchorPoint = $(_opts.anchorPoint)[0];
+                _anchorPoint = _newsContainer;
+                if (document.querySelector(_opts.anchorPoint)) {
+                    _anchorPoint = document.querySelector(_opts.anchorPoint);
                 }
 
                 // Instantiate the vue container
-                const vueInit = await _vueInit();
+                await _vueInit();
 
                 // Call initial request
-                const fetch = await _load(true);
+                await _load(true);
 
                 // Load elements on domready or load them when scrolling to the bottom
                 if (_opts.loadAllOnDomready === true) {
+                    _opts.showLoadMoreButton = false;
                     _load();
                     _xhrInterval = setInterval(_load, 3000);
                 } else if (_opts.showLoadMoreButton === false) {
                     // load content by event scroll
-                    $(_scrollContainer).on('scroll', function () {
+                    _scrollContainer.addEventListener('scroll', function () {
                         if ($(_scrollContainer).scrollTop() > ($(_anchorPoint).offset().top + $(_anchorPoint).innerHeight() - $(_scrollContainer).height() - _opts.bottomPixels)) {
                             _load();
                         }
                     });
                 }
-
-
             };
 
 
@@ -210,7 +210,7 @@
              * @private
              */
             const _vueInit = async function () {
-                const appId = $(_newsContainer).prop('id');
+                const appId = _newsContainer.getAttribute('id');
 
                 if (!appId) {
                     console.error(
@@ -319,7 +319,7 @@
                     const onXhrStart = await _opts.onXHRStart(_self);
 
                     // Set aria-busy property to true
-                    $(_newsContainer).attr('aria-busy', 'true');
+                    _newsContainer.setAttribute('aria-busy', 'true');
 
                     _vueModel.blnLoadingInProcess = true;
                     _vueModel.showLoadMoreButton = false;
@@ -338,7 +338,7 @@
 
                     const data = await _self.xhr.json();
 
-                    $(_newsContainer).attr('aria-busy', 'false');
+                    _newsContainer.setAttribute('aria-busy', 'false');
 
                     return data;
 
@@ -357,7 +357,7 @@
                 _vueModel.blnLoadingInProcess = false;
 
                 // Set aria-busy property to false
-                $(_newsContainer).attr('aria-busy', 'false');
+                _newsContainer.setAttribute('aria-busy', 'false');
 
                 // Trigger onXHRFail-callback
                 _opts.onXHRFail(_self, _self.xhr);
@@ -372,7 +372,7 @@
                 // Trigger onBeforeAppendCallback
                 _opts.onBeforeAppendCallback(_self, _self.xhr);
 
-                if (_self.response.data != '') {
+                if (_self.response.data !== '') {
                     // Append html to dom
                     _vueModel.articles = _vueModel.articles + _self.response.data;
                 }
