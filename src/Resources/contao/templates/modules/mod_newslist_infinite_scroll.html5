@@ -9,15 +9,12 @@
 
 <div v-if="blnLoadingInProcess" class="inf-scr-loading-in-process-container text-center mt-4">
     <div><i class="fas fa-5x fa-spinner fa-spin mb-4"></i></div>
-    <?= $this->trans("MSC.infScrLoadingInProcess") ?>
+    <?= $this->trans('MSC.infScrLoadingInProcess') ?>
 </div>
 
 <div v-if="showLoadMoreButton === true" class="inf-scr-load-more-btn-container text-center mt-4">
-    <button v-on:click="load" class="btn btn-primary w-100"><?= $this->trans("MSC.infScrLoadMore") ?></button>
+    <button v-on:click="load" class="btn btn-primary w-100"><?= $this->trans('MSC.infScrLoadMore') ?></button>
 </div>
-
-
-
 
 <div style="display:none">
 <?= $this->pagination ?>
