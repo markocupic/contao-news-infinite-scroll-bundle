@@ -157,7 +157,6 @@
                     }
 
                     // Generate all urls from first to last
-                    let i;
                     for (i = idNext; i <= idLast; i++) {
                         const url = hrefNext.replace(regexpNext, 'page_n' + idModule + '=' + i);
                         _arrUrls.push(url);
@@ -272,7 +271,10 @@
                 // Trigger onXHRComplete
                 _self.response = _opts.onXHRComplete(response, _self, _self.xhr);
 
-                _self.urlIndex++;
+                if(!initialReq)
+                {
+                    _self.urlIndex++;
+                }
 
                 new Promise((resolve, reject) => {
                     setTimeout(() => {
