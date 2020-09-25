@@ -165,7 +165,7 @@
                 }
 
                 // scrollContainer
-                _scrollContainer = _opts.scrollContainer;
+                _scrollContainer = window === _opts.scrollContainer ? window : document.querySelector(_opts.scrollContainer);
                 if (!_scrollContainer) {
                     console.error('ContaoNewsInfiniteScroll aborted! Please select a valid scroll container.');
                     return;
@@ -194,9 +194,13 @@
                     _load();
                     _xhrInterval = setInterval(_load, 3000);
                 } else if (_opts.showLoadMoreButton === false) {
-                    // load content by event scroll
+
+                    // load content when user scrolls an reaches the anchor point
                     _scrollContainer.addEventListener('scroll', function () {
-                        if ($(_scrollContainer).scrollTop() > ($(_anchorPoint).offset().top + $(_anchorPoint).innerHeight() - $(_scrollContainer).height() - _opts.bottomPixels)) {
+                        let scrContScrollTop = window === _scrollContainer ? _scrollContainer.scrollY : _scrollContainer.scrollTop;
+                        let scrContOffsetHeight = window === _scrollContainer ? _scrollContainer.innerHeight : _scrollContainer.offsetHeight;
+
+                        if (Math.floor(scrContScrollTop) > (_anchorPoint.offsetTop + _anchorPoint.offsetHeight - scrContOffsetHeight - _opts.bottomPixels)) {
                             _load();
                         }
                     });
