@@ -12,26 +12,23 @@
         /**
          * @param {Object} options
          */
-        ContaoNewsInfiniteScroll = function (options) {
+        ContaoNewsInfiniteScroll = function (newslist, options) {
             let _opts = $.extend({
                 // Defaults
 
-                // CSS selector: Define the parent news list container css selector
-                newsContainer: '.mod_newslist_infinite_scroll',
-                // CSS selector: Default to window
+                // DOM element: Default to window
                 scrollContainer: window,
-                // CSS selector: Pagination next  (<nav class="pagination block"><ul><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul></nav>)
-                paginationNextLink: '.pagination .next > a.next',
-                // CSS selector: Pagination last  (<nav class="pagination block"><ul><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul></nav>)
-                paginationLastLink: '.pagination .last > a.last',
+                // DOM element: Pagination next  (<nav class="pagination block"><ul><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul></nav>)
+                paginationNextLink: newslist.querySelector('.pagination .next > a.next'),
+                // DOM element: Pagination last  (<nav class="pagination block"><ul><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul></nav>)
+                paginationLastLink: newslist.querySelector('.pagination .last > a.last'),
                 // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
                 loadAllOnDomready: false,
                 // Use a "load more button" (Preserve the accessibility of the footer)
                 // !!!! Important Set showLoadMoreButton to false, if you want to autoload items
                 showLoadMoreButton: true,
-                // Load more button markup
                 // CSS selector: When you scroll and the window has reached the anchor point, requests will start
-                anchorPoint: '.mod_newslist_infinite_scroll',
+                anchorPoint: newslist,
                 // Distance in px from the top of the anchorPoint
                 bottomPixels: 100,
                 // Integer: Fading time for appending news items
@@ -56,7 +53,7 @@
 
             // Private properties
             let _self = this;
-            let _newsContainer = null;
+            let _newsContainer = newslist;
             let _anchorPoint = null;
             let _scrollContainer = null;
             let _arrUrls = [];
@@ -106,26 +103,34 @@
             const _initialize = async function () {
 
                 // Trigger onInitialize-callback
-                if (_opts.onInitialize(_self) !== true) {
+                if (!_opts.onInitialize(_self)) {
                     return;
                 }
 
                 // newsContainer
-                _newsContainer = document.querySelector(_opts.newsContainer);
                 if (!_newsContainer) {
                     return;
                 }
 
+                // Check if there are multiple newslist modules with the same id
+                let id = _newsContainer.getAttribute('id');
+                if (id) {
+                    if (document.querySelectorAll('#' + id).length > 1) {
+                        alert('Aborted newslist infinite scroll initialization. Do not use multiple "newslist infinite scroll" modules with the same CSS ID on the same page.');
+                        return;
+                    }
+                }
+
                 // If there is no pagination, there are no news items to load
-                if (!document.querySelector(_opts.newsContainer + ' ' + _opts.paginationNextLink)) {
+                if (!_opts.paginationNextLink) {
                     // Skip initialization process
-                    return;
+                    console.log('Warning! Could not find a newslist pagination during the newslist infinite scroll initialization. Enable the pagination in the newslist infinite scroll module settings in the contao backend.');
                 }
 
                 // Get request urls from pagination links
-                if (document.querySelector(_opts.newsContainer + ' ' + _opts.paginationNextLink)) {
+                if (_opts.paginationNextLink) {
                     // get first request url
-                    const next = document.querySelector(_opts.newsContainer + ' ' + _opts.paginationNextLink);
+                    const next = _opts.paginationNextLink;
                     const hrefNext = next.getAttribute('href');
 
                     // page_n(\\d*)=(\\d*)/g;
@@ -143,9 +148,9 @@
                     let idLast = idNext;
 
                     // if the next url is same to last url there is no last url
-                    if (document.querySelector(_opts.newsContainer + ' ' + _opts.paginationLastLink)) {
+                    if (_opts.paginationLastLink) {
                         // get last request url
-                        const last = document.querySelector(_opts.newsContainer + ' ' + _opts.paginationLastLink);
+                        const last = _opts.paginationLastLink;
                         const hrefLast = last.getAttribute('href');
                         // page_n(\\d*)=(\\d*)/g;
                         const regexpLast = new RegExp(paginationUrlRegexPattern, "g");
@@ -157,6 +162,7 @@
                     }
 
                     // Generate all urls from first to last
+                    let i;
                     for (i = idNext; i <= idLast; i++) {
                         const url = hrefNext.replace(regexpNext, 'page_n' + idModule + '=' + i);
                         _arrUrls.push(url);
@@ -164,7 +170,7 @@
                 }
 
                 // scrollContainer
-                _scrollContainer = window === _opts.scrollContainer ? window : document.querySelector(_opts.scrollContainer);
+                _scrollContainer = _opts.scrollContainer;
                 if (!_scrollContainer) {
                     console.error('ContaoNewsInfiniteScroll aborted! Please select a valid scroll container.');
                     return;
@@ -177,8 +183,8 @@
 
                 // anchor points settings
                 _anchorPoint = _newsContainer;
-                if (document.querySelector(_opts.anchorPoint)) {
-                    _anchorPoint = document.querySelector(_opts.anchorPoint);
+                if (_opts.anchorPoint) {
+                    _anchorPoint = _opts.anchorPoint;
                 }
 
                 // Instantiate the vue container
@@ -236,11 +242,11 @@
                             _load();
                         }
                     }
-                }
+                };
 
                 _vueModel = Vue.createApp(vueData).mount('#' + appId);
 
-            }
+            };
 
             /**
              * Prepare fetch
@@ -260,19 +266,14 @@
                     _self.currentUrl = window.location.href;
                 }
 
-                if (typeof _self.currentUrl === 'undefined') {
-                    throw new Error('Invalid url.')
-                }
-
-                const response = await _fetch(_self.currentUrl);
+                const response = await _fetch();
 
                 _self.blnHasError = false;
 
                 // Trigger onXHRComplete
                 _self.response = _opts.onXHRComplete(response, _self, _self.xhr);
 
-                if(!initialReq)
-                {
+                if (!initialReq) {
                     _self.urlIndex++;
                 }
 
@@ -319,10 +320,10 @@
              * @returns {Promise<any>}
              * @private
              */
-            const _fetch = async function (url) {
+            const _fetch = async function () {
                 try {
                     // Trigger onXHRStart-Callback
-                    const onXhrStart = await _opts.onXHRStart(_self);
+                    _opts.onXHRStart(_self);
 
                     // Set aria-busy property to true
                     _newsContainer.setAttribute('aria-busy', 'true');
@@ -330,7 +331,7 @@
                     _vueModel.blnLoadingInProcess = true;
                     _vueModel.showLoadMoreButton = false;
 
-                    _self.xhr = await fetch(url, {
+                    _self.xhr = await fetch(_self.currentUrl, {
                         headers: {
                             'x-requested-with': 'XMLHttpRequest'
                         }
@@ -342,14 +343,17 @@
                         throw new Error(`An error has occured: ${_self.xhr.status}`);
                     }
 
-                    const data = await _self.xhr.json();
+                    let response = await _self.xhr.json();
 
+                    // Trigger onXHRComplete-callback
+                    response = _opts.onXHRComplete(response, _self, _self.xhr);
                     _newsContainer.setAttribute('aria-busy', 'false');
 
-                    return data;
+                    return response;
 
                 } catch (error) {
-                    throw new Error('An error occured, while using fetch.');
+                    _fail();
+                    throw new Error(error);
                 }
 
             };

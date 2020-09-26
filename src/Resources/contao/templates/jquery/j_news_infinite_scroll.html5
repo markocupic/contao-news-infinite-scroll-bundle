@@ -1,36 +1,32 @@
 <script src="https://unpkg.com/vue@next"></script>
 
+
 <script>
-    (function ($) {
-        $(document).ready(function () {
+    Array.prototype.map.call(document.querySelectorAll('.mod_newslist_infinite_scroll'), function(newslist) {
+
             /**
              * Generate the ContaoNewsInfiniteScroll object
              * requires news_infinite_scroll.js
              * @type {ContaoNewsInfiniteScroll}
              */
-            var contaoNewsInfiniteScroll = new ContaoNewsInfiniteScroll({
-                // CSS selector: Define the parent news list container css selector
-                newsContainer: '.mod_newslist_infinite_scroll',
-                // CSS selector: Default to window
+            var contaoNewsInfiniteScroll = new ContaoNewsInfiniteScroll(newslist, {
+                // DOM element: Default to window
                 scrollContainer: window,
-                // CSS selector: Pagination next  (<nav class="pagination block"><ul><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul></nav>)
-                paginationNextLink: '.pagination .next > a.next',
-                // CSS selector: Pagination last  (<nav class="pagination block"><ul><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul></nav>)
-                paginationLastLink: '.pagination .last > a.last',
+                // DOM element: Pagination next  (<nav class="pagination block"><ul><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul></nav>)
+                paginationNextLink: newslist.querySelector('.pagination .next > a.next'),
+                // DOM element: Pagination last  (<nav class="pagination block"><ul><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul></nav>)
+                paginationLastLink: newslist.querySelector('.pagination .last > a.last'),
                 // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
                 loadAllOnDomready: false,
                 // Use a "load more button" (Preserve the accessibility of the footer)
                 // !!!! Important Set showLoadMoreButton to false, if you want to autoload items
                 showLoadMoreButton: true,
                 // CSS selector: When you scroll and the window has reached the anchor point, requests will start
-                anchorPoint: '.mod_newslist_infinite_scroll',
+                anchorPoint: newslist,
                 // Distance in px from the top of the anchorPoint
                 bottomPixels: 100,
                 // Integer: Fading time for appending news items
                 fadeInTime: 400,
-                // HTML: Show this message during the loading process
-                loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container mt-4 text-center"><i class="fal fa-5x fa-spinner fa-spin"></i>{{br}}{{br}}<?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadingInProcess"] ?>...</em></div>',
-
 
                 // Callbacks
                 /**
@@ -39,7 +35,11 @@
                  */
                 onInitialize: function (instance) {
                     // Hide pagination
-                    $(instance.getOption('newsContainer') + ' .pagination').hide();
+                    let pagination = newslist.querySelector('.pagination');
+                    if(pagination)
+                    {
+                        pagination.style.visibility = 'hidden';
+                    }
 
                     // Return false to abort initialization
                     return true;
@@ -48,19 +48,20 @@
                 /**
                  * @param instance
                  */
-                onXHRStart: function (instance) {
+                onXHRStart: function (instance, url) {
                     // Do some actions
+                    return 'https://google.ch'
                 },
 
                 /**
-                 * @param html
+                 * @param json
                  * @param instance
                  * @param xhr
                  * @returns string
                  */
-                onXHRComplete: function (html, instance, xhr) {
+                onXHRComplete: function (response, instance, xhr) {
                     // Do some actions
-                    return html;
+                    return response;
                 },
 
                 /**
@@ -68,6 +69,7 @@
                  * @param xhr
                  */
                 onXHRFail: function (instance, xhr) {
+                    console.log(xhr);
                     console.error('No response from server with address: ' + instance.currentUrl);
                     console.error('Status code: ' + xhr.status);
                 },
@@ -92,5 +94,5 @@
                 }
             });
         });
-    }(jQuery));
+
 </script>
