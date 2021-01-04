@@ -13,7 +13,7 @@
   "authors": [
     {
       "name": "Marko Cupic",
-      "homepage": "https://github.com/markocupic"
+      "homepage": "https://github.com/markocupic/contao-news-infinite-scroll-bundle"
     }
   ],
   "require": {

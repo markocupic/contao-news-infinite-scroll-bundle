@@ -1,20 +1,22 @@
+"use strict";
+
+let ContaoNewsInfiniteScroll;
+
 /**
  * Contao News Infinite Scroll Bundle
  *
  * Copyright (c) 2021 Marko Cupic
  *
- * @author Marko Cupic <https://github.com/markocupic>
+ * @author Marko Cupic <https://github.com/markocupic/contao-news-infinite-scroll-bundle>
  *
  * @license LGPL-3.0+
  */
-
 (function ($) {
     /**
      * @param options
      * @constructor
      */
     ContaoNewsInfiniteScroll = function (options) {
-        "use strict";
 
         let _opts = $.extend({
             // Defaults
@@ -45,30 +47,34 @@
 
             // Callbacks
             onInitialize: function (instance) {
+                //
             },
             onXHRStart: function (instance) {
+                //
             },
             onXHRComplete: function (response, instance, xhr) {
                 return response;
             },
             onXHRFail: function (instance, xhr) {
+                //
             },
             onBeforeAppendCallback: function (instance, xhr) {
+                //
             },
             onAppendCallback: function (instance, xhr) {
+                //
             }
         }, options || {});
-
 
         // Private variables
         let _self = this;
         let _newsContainer = null;
         let _anchorPoint = null;
         let _scrollContainer = null;
-        let _blnLoadingInProcess = 0;
+        let _blnLoadingInProcess = false;
         let _arrUrls = [];
-        let _blnLoadedAllItems = 0;
-        let _xhrInterval = 0;
+        let _blnLoadedAllItems = false;
+        let _xhrInterval = null;
 
         // Public variables
         _self.blnHasError = false;
@@ -88,7 +94,6 @@
          */
         this.getOption = function (option) {
             if (typeof _opts[option] !== 'undefined') {
-
                 return _opts[option];
             }
             return false;
@@ -97,7 +102,8 @@
         /** Private Methods **/
 
         /**
-         * Init function
+         * Initialize application
+         * @private
          */
         let _initialize = function () {
             // Trigger onInitialize-callback
@@ -164,7 +170,7 @@
             }
 
             // Bottom Pixels
-            if (_opts.bottomPixels == 0) {
+            if (_opts.bottomPixels === 0) {
                 _opts.bottomPixels = 1;
             }
 
@@ -181,16 +187,16 @@
                 _xhrInterval = setInterval(_load, 3000);
             } else if (_opts.loadMoreButton === true) {
                 _self.loadMoreBtn = $(_opts.loadMoreButtonMarkup);
-                _self.loadMoreBtn.insertAfter(_newsContainer)
-                _self.loadMoreBtn.addClass('inf-scr-load-more-btn-container');
-                _self.loadMoreBtn.click(function (event) {
-                    $(this).hide();
+                _self.loadMoreBtn
+                .insertAfter(_newsContainer)
+                .addClass('inf-scr-load-more-btn-container')
+                .click(event => {
+                    $(event.currentTarget).hide();
                     _load();
                 });
-
             } else {
                 // load content by event scroll
-                $(_scrollContainer).on('scroll', function () {
+                $(_scrollContainer).on('scroll', () => {
                     if ($(_scrollContainer).scrollTop() > ($(_anchorPoint).offset().top + $(_anchorPoint).innerHeight() - $(_scrollContainer).height() - _opts.bottomPixels)) {
                         _load();
                     }
@@ -200,30 +206,34 @@
 
         /**
          * Fetch html from server
+         * @private
          */
         let _load = function () {
 
-            if (_blnLoadingInProcess == 1 || _blnLoadedAllItems == 1) return;
+            if (_blnLoadingInProcess === true || _blnLoadedAllItems === true) return;
             _self.blnHasError = false;
 
             _self.currentUrl = _arrUrls[_self.urlIndex];
             if (typeof _self.currentUrl !== 'undefined') {
                 _self.xhr = $.ajax({
                     url: _self.currentUrl,
-                    beforeSend: function () {
+                    beforeSend: () => {
                         // Trigger onXHRStart-Callback
                         _opts.onXHRStart(_self);
 
                         // Set aria-busy propery to true
                         $(_newsContainer).attr('aria-busy', 'true');
 
-                        _blnLoadingInProcess = 1;
+                        _blnLoadingInProcess = true;
                         if (_opts.loadingInProcessContainer != '') {
                             // Append Load Icon
-                            $(_opts.loadingInProcessContainer).addClass('inf-scr-loading-in-process-container').insertAfter(_newsContainer).fadeIn(100);
+                            $(_opts.loadingInProcessContainer)
+                            .addClass('inf-scr-loading-in-process-container')
+                            .insertAfter(_newsContainer)
+                            .fadeIn(100);
                         }
                     }
-                }).done(function (data) {
+                }).done((data) => {
                     _self.blnHasError = false;
                     _self.response = data;
 
@@ -232,26 +242,25 @@
 
                     if (_self.blnHasError === false) {
                         _self.urlIndex++;
-                        setTimeout(function () {
+                        setTimeout(() => {
                             _appendToDom();
                         }, 1000);
                     } else {
                         _fail();
                     }
-                }).fail(function () {
+                }).fail(() => {
                     _fail();
-                }).always(function () {
-                    setTimeout(function () {
+                }).always(() => {
+                    setTimeout(() => {
                         // Remove Load Icon
                         $('.inf-scr-loading-in-process-container').remove();
 
                         // Set aria-busy propery to false
                         $(_newsContainer).attr('aria-busy', 'false');
-
                         // If all items are loaded...
-                        if (_arrUrls.length == _self.urlIndex) {
+                        if (_arrUrls.length === _self.urlIndex) {
                             // Set _blnLoadedAllItems to true
-                            _blnLoadedAllItems = 1;
+                            _blnLoadedAllItems = true;
 
                             // Remove the loadMoreButton
                             if ($(_self.loadMoreBtn).length) {
@@ -269,11 +278,11 @@
                             _self.loadMoreBtn.show();
                         }
 
-                        _blnLoadingInProcess = 0;
+                        _blnLoadingInProcess = false;
                     }, 1000);
                 })
             } else {
-                _blnLoadedAllItems = 1;
+                _blnLoadedAllItems = true;
                 if (typeof _xhrInterval !== 'undefined') {
                     clearInterval(_xhrInterval);
                 }
@@ -281,19 +290,18 @@
         };
 
         /**
-         * Fail Method
+         * Fail method
+         * @private
          */
         let _fail = function () {
 
-            _blnLoadingInProcess = 0;
+            _blnLoadingInProcess = false;
             // Trigger onXHRFail-callback
             _opts.onXHRFail(_self, _self.xhr);
         };
 
         /**
-         *
-         * @param html
-         * @param xhr
+         * Append html to target container
          * @private
          */
         let _appendToDom = function () {
@@ -303,7 +311,10 @@
 
             if (_self.response != '') {
                 // Append html to dom and fade in
-                $(_self.response).hide().appendTo(_newsContainer).fadeIn(_opts.fadeInTime);
+                $(_self.response)
+                .hide()
+                .appendTo(_newsContainer)
+                .fadeIn(_opts.fadeInTime);
             }
 
             // Trigger onAppendCallback
