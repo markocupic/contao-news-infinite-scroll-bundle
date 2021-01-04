@@ -1,23 +1,21 @@
 "use strict";
 
+/*
+ * This file is part of Resource Booking Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license LGPL-3.0+
+ * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
+ */
+
 let ContaoNewsInfiniteScroll;
 
-/**
- * Contao News Infinite Scroll Bundle
- *
- * Copyright (c) 2021 Marko Cupic
- *
- * @author Marko Cupic <https://github.com/markocupic/contao-news-infinite-scroll-bundle>
- *
- * @license LGPL-3.0+
- */
 (function ($) {
     /**
      * @param options
      * @constructor
      */
     ContaoNewsInfiniteScroll = function (options) {
-
         let _opts = $.extend({
             // Defaults
 

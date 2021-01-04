@@ -7,7 +7,7 @@
              * requires news_infinite_scroll.js
              * @type {ContaoNewsInfiniteScroll}
              */
-            var contaoNewsInfiniteScroll = new ContaoNewsInfiniteScroll({
+             new ContaoNewsInfiniteScroll({
                 // CSS selector: Append loaded items to this container
                 newsContainer: '.mod_newslist_infinite_scroll',
                 // CSS selector: Default to $(window)
@@ -22,7 +22,7 @@
                 // !!!! Important Set loadMoreButton to false, if you want to autoload items
                 loadMoreButton: true,
                 // Load more button markup
-                loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container text-center"><button class="btn btn-primary w-100"><?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadMore"] ?></button></div>',
+                loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container text-center"><button class="btn btn-primary w-100"><?= $GLOBALS['TL_LANG']['MSC']['infScrLoadMore'] ?></button></div>',
                 // CSS selector: When you scroll and the window has reached the anchor point, requests will start
                 anchorPoint: '.mod_newslist_infinite_scroll',
                 // Distance in px from the top of the anchorPoint
@@ -30,7 +30,7 @@
                 // Integer: Fading time for appending news items
                 fadeInTime: 400,
                 // HTML: Show this message during the loading process
-                loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container text-center"><i class="fa fa-5x fa-spinner fa-spin"></i>{{br}}{{br}}<?= $GLOBALS["TL_LANG"]["MSC"]["infScrLoadingInProcess"] ?>...</em></div>',
+                loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container text-center"><i class="fa fa-5x fa-spinner fa-spin"></i>{{br}}{{br}}<?= $GLOBALS['TL_LANG']['MSC']['infScrLoadingInProcess'] ?>...</em></div>',
 
 
                 // Callbacks
