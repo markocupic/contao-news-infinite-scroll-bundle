@@ -3,7 +3,7 @@
 /**
  * Contao News Infinite Scroll Bundle
  *
- * Copyright (c) 2020 Marko Cupic
+ * Copyright (c) 2021 Marko Cupic
  *
  * @author Marko Cupic <https://github.com/markocupic>
  *

@@ -1,7 +1,7 @@
 /**
  * Contao News Infinite Scroll Bundle
  *
- * Copyright (c) 2020 Marko Cupic
+ * Copyright (c) 2021 Marko Cupic
  *
  * @author Marko Cupic <https://github.com/markocupic>
  *
@@ -10,9 +10,12 @@
 
 (function ($) {
     /**
-     * @param {Object} options
+     * @param options
+     * @constructor
      */
     ContaoNewsInfiniteScroll = function (options) {
+        "use strict";
+
         let _opts = $.extend({
             // Defaults
 
@@ -129,7 +132,7 @@
                     return;
                 }
                 let idModule = matchNext[1]
-                let idNext = matchNext[2];
+                let idNext = parseInt(matchNext[2]);
                 let idLast = idNext;
 
                 // if the next url is same to last url there is no last url
@@ -142,17 +145,16 @@
                     let matchLast = regexpLast.exec(hrefLast);
                     if (matchLast) {
                         // Overwrite idLast
-                        idLast = matchLast[2];
+                        idLast = parseInt(matchLast[2]);
                     }
                 }
 
                 // Generate all urls from first to last
-                for (i = idNext; i <= idLast; i++) {
+                for (let i = idNext; i <= idLast; i++) {
                     let url = hrefNext.replace(regexpNext, 'page_n' + idModule + '=' + i);
                     _arrUrls.push(url);
                 }
             }
-
 
             // scrollContainer
             _scrollContainer = $(_opts.scrollContainer)[0];

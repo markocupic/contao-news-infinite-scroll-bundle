@@ -3,7 +3,7 @@
 /**
  * Contao News Infinite Scroll Bundle
  *
- * Copyright (c) 2020 Marko Cupic
+ * Copyright (c) 2021 Marko Cupic
  *
  * @author Marko Cupic <https://github.com/markocupic>
  *
@@ -44,18 +44,14 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
             return $objTemplate->parse();
         }
 
-        $this->strTemplate = 'mod_newslist_infinite_scroll';
-        if ($this->customTpl != '')
-        {
-            $this->strTemplate = $this->customTpl;
-        }
-
         // Do not add the page to the search index on ajax calls
         // Send articles without a frame to the browser
         if (Environment::get('isAjaxRequest'))
         {
             global $objPage;
             $objPage->noSearch;
+
+            $this->strTemplate = 'mod_newslist_infinite_scroll';
         }
 
         return parent::generate();
@@ -77,8 +73,7 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
             $this->Template->pagination = '';
             $this->Template->archives = $this->news_archives;
 
-            echo implode('', $this->Template->articles);
-            //$this->Template->output();
+            $this->Template->output();
             exit();
         }
     }
