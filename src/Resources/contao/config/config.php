@@ -17,7 +17,7 @@ use Markocupic\ModuleNewslistInfiniteScroll;
  */
 if (TL_MODE === 'FE' && !Environment::get('isAjaxRequest'))
 {
-    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaonewsinfinitescroll/js/news_infinite_scroll.min.js|static';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaonewsinfinitescroll/js/news_infinite_scroll.js|static';
 }
 
 /**

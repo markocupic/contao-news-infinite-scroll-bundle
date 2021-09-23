@@ -13,9 +13,12 @@
 namespace Markocupic;
 
 use Contao\BackendTemplate;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\Environment;
+use Contao\Input;
 use Contao\ModuleNewsList;
 use Patchwork\Utf8;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Display Infinite Scroll Newslist Module
@@ -62,19 +65,22 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
      */
     protected function compile()
     {
-        parent::compile();
-
         // Add Css Class
-        $this->Template->cssID[1] = $this->Template->cssID[1] == '' ? 'ajaxCall' : $this->Template->cssID[1] . ' ajaxCall';
+        $cssID = $this->cssID;
+        $cssID[1] = $cssID[1] == '' ? 'ajaxCall' : $cssID[1] . ' ajaxCall';
+        $this->cssID = $cssID;
 
-        if (Environment::get('isAjaxRequest'))
+        parent::compile();
+        
+        if (Environment::get('isAjaxRequest') && null !== Input::get('page_n'.$this->id) && null !== Input::get('ajaxCall'))
         {
             $this->Template->headline = '';
             $this->Template->pagination = '';
             $this->Template->archives = $this->news_archives;
 
-            $this->Template->output();
-            exit();
+            throw new ResponseException($this->Template->getResponse(true, true));
         }
+
+        parent::compile();
     }
 }
