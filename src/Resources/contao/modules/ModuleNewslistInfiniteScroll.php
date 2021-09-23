@@ -13,9 +13,12 @@
 namespace Markocupic;
 
 use Contao\BackendTemplate;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\Environment;
+use Contao\Input;
 use Contao\ModuleNewsList;
 use Patchwork\Utf8;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Display Infinite Scroll Newslist Module
@@ -46,12 +49,17 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
 
         // Do not add the page to the search index on ajax calls
         // Send articles without a frame to the browser
-        if (Environment::get('isAjaxRequest'))
+        if ($this->isAjaxRequest())
         {
             global $objPage;
             $objPage->noSearch;
 
             $this->strTemplate = 'mod_newslist_infinite_scroll';
+        }
+        else
+        {
+            // Load JavaScript
+            $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaonewsinfinitescroll/js/news_infinite_scroll.min.js';
         }
 
         return parent::generate();
@@ -62,19 +70,30 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
      */
     protected function compile()
     {
-        parent::compile();
-
         // Add Css Class
-        $this->Template->cssID[1] = $this->Template->cssID[1] == '' ? 'ajaxCall' : $this->Template->cssID[1] . ' ajaxCall';
+        $cssID = $this->cssID;
+        $cssID[1] = trim($cssID[1].' ajaxCall');
+        $this->cssID = $cssID;
 
-        if (Environment::get('isAjaxRequest'))
+        parent::compile();
+        
+        if ($this->isAjaxRequest())
         {
             $this->Template->headline = '';
             $this->Template->pagination = '';
             $this->Template->archives = $this->news_archives;
 
-            $this->Template->output();
-            exit();
+            throw new ResponseException($this->Template->getResponse(true, true));
         }
+
+        parent::compile();
+    }
+
+    /**
+     * Checks whether the request is an AJAX request for this module
+     */
+    private function isAjaxRequest(): bool
+    {
+        return Environment::get('isAjaxRequest') && null !== Input::get('page_n'.$this->id) && null !== Input::get('ajaxCall');
     }
 }

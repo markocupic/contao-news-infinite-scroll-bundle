@@ -211,7 +211,7 @@ let ContaoNewsInfiniteScroll;
             if (_blnLoadingInProcess === true || _blnLoadedAllItems === true) return;
             _self.blnHasError = false;
 
-            _self.currentUrl = _arrUrls[_self.urlIndex];
+            _self.currentUrl = _arrUrls[_self.urlIndex]+'&ajaxCall';
             if (typeof _self.currentUrl !== 'undefined') {
                 _self.xhr = $.ajax({
                     url: _self.currentUrl,
