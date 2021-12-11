@@ -1,7 +1,7 @@
 <script>
     (function ($) {
         $(document).ready(function () {
-            if (typeof ContaoNewsInfiniteScroll === 'function') { 
+            if (typeof ContaoNewsInfiniteScroll === 'function') {
                 /**
                  * Generate the ContaoNewsInfiniteScroll object
                  * requires news_infinite_scroll.js
@@ -12,9 +12,9 @@
                     newsContainer: '.mod_newslist_infinite_scroll',
                     // CSS selector: Default to $(window)
                     scrollContainer: $(window),
-                    // CSS selector: Pagination next  (<nav class="pagination block"><ul><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul></nav>)
+                    // CSS selector: Pagination next (<nav class="pagination block"><ul><li class="next"><a href="newslist.html?page_n343=2" class="next" title="Gehe zu Seite 2">Vorwärts</a></li></ul></nav>)
                     paginationNextLink: '.pagination .next > a.next',
-                    // CSS selector: Pagination last  (<nav class="pagination block"><ul><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul></nav>)
+                    // CSS selector: Pagination last (<nav class="pagination block"><ul><li class="last"><a href="newslist.html?page_n343=44" class="last" title="Gehe zu Seite 44">Ende</a></li></ul></nav>)
                     paginationLastLink: '.pagination .last > a.last',
                     // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
                     loadAllOnDomready: false,
@@ -22,10 +22,7 @@
                     // !!!! Important Set loadMoreButton to false, if you want to autoload items
                     loadMoreButton: true,
                     // Load more button markup
-                    loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container text-center"><button class="btn btn-primary w-100"><?= $GLOBALS['
-                    TL_LANG']['
-                    MSC']['
-                    infScrLoadMore'] ?></button></div>',
+                    loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container text-center"><button class="btn btn-primary w-100"><?= $GLOBALS['TL_LANG']['MSC']['infScrLoadMore'] ?></button></div>',
                     // CSS selector: When you scroll and the window has reached the anchor point, requests will start
                     anchorPoint: '.mod_newslist_infinite_scroll',
                     // Distance in px from the top of the anchorPoint
@@ -33,11 +30,7 @@
                     // Integer: Fading time for appending news items
                     fadeInTime: 400,
                     // HTML: Show this message during the loading process
-                    loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container text-center"><i class="fa fa-5x fa-spinner fa-spin"></i>{{br}}{{br}}<?= $GLOBALS['
-                    TL_LANG']['
-                    MSC']['
-                    infScrLoadingInProcess'] ?>...</em></div>',
-
+                    loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container text-center"><i class="fa fa-5x fa-spinner fa-spin"></i>{{br}}{{br}}<?= $GLOBALS['TL_LANG']['MSC']['infScrLoadingInProcess'] ?>...</em></div>',
 
                     // Callbacks
                     /**
