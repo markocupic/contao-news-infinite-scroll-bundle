@@ -13,7 +13,7 @@
 namespace Markocupic;
 
 use Contao\BackendTemplate;
-use Contao\CoreBundle\Exception\ResponseException;
+use Contao\CoreBundle\Exception\ResponseException; 
 use Contao\Environment;
 use Contao\Input;
 use Contao\ModuleNewsList;
