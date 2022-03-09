@@ -17,15 +17,7 @@ use Contao\CoreBundle\Exception\ResponseException;
 use Contao\Environment;
 use Contao\Input;
 use Contao\ModuleNewsList;
-use Patchwork\Utf8;
-use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Display Infinite Scroll Newslist Module
- *
- * Class ModuleNewslistInfiniteScroll
- * @package Markocupic
- */
 class ModuleNewslistInfiniteScroll extends ModuleNewsList
 {
     /**
@@ -38,7 +30,7 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
         if (TL_MODE === 'BE')
         {
             $objTemplate = new BackendTemplate('be_wildcard');
-            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['contao_news_infinite_scroll'][0]) . ' ###';
+            $objTemplate->wildcard = '### ' . $GLOBALS['TL_LANG']['FMD']['contao_news_infinite_scroll'][0] . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
@@ -70,13 +62,13 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
      */
     protected function compile()
     {
-        // Add Css Class
+        // Add CSS Class
         $cssID = $this->cssID;
         $cssID[1] = trim($cssID[1].' ajaxCall');
         $this->cssID = $cssID;
 
         parent::compile();
-        
+
         if ($this->isAjaxRequest())
         {
             $this->Template->headline = '';
