@@ -13,10 +13,11 @@
 namespace Markocupic;
 
 use Contao\BackendTemplate;
-use Contao\CoreBundle\Exception\ResponseException; 
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\Environment;
 use Contao\Input;
 use Contao\ModuleNewsList;
+use Contao\System;
 
 class ModuleNewslistInfiniteScroll extends ModuleNewsList
 {
@@ -27,8 +28,9 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
      */
     public function generate()
     {
-        if (TL_MODE === 'BE')
-        {
+        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
+
+        if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
             $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->wildcard = '### ' . $GLOBALS['TL_LANG']['FMD']['contao_news_infinite_scroll'][0] . ' ###';
             $objTemplate->title = $this->headline;
