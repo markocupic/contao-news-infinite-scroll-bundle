@@ -32,7 +32,7 @@
             "contao/config/",
             "contao/dca/",
             "contao/languages/",
-            "templates/"
+            "contao/templates/"
         ]
     },
     "extra": {
