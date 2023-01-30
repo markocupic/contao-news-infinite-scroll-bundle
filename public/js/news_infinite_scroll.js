@@ -1,13 +1,13 @@
 "use strict";
 
-/**
- * Contao News Infinite Scroll Bundle
+/*
+ * This file is part of Contao News Infinite Scroll Bundle.
  *
- * Copyright (c) 2021 Marko Cupic
- *
- * @author Marko Cupic <https://github.com/markocupic/contao-news-infinite-scroll-bundle>
- *
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license LGPL-3.0+
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
  */
 
 let ContaoNewsInfiniteScroll;
@@ -213,7 +213,7 @@ let ContaoNewsInfiniteScroll;
             if (_blnLoadingInProcess === true || _blnLoadedAllItems === true) return;
             _self.blnHasError = false;
 
-            _self.currentUrl = _arrUrls[_self.urlIndex]+'&ajaxCall';
+            _self.currentUrl = _arrUrls[_self.urlIndex] + '&ajaxCall';
             if (typeof _self.currentUrl !== 'undefined') {
                 _self.xhr = $.ajax({
                     url: _self.currentUrl,

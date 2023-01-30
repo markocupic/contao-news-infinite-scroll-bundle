@@ -12,14 +12,12 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
  */
 
-namespace Markocupic\ContaoNewsInfiniteScrollBundle;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-class MarkocupicContaoNewsInfiniteScrollBundle extends Bundle
-{
-    public function getPath(): string
-    {
-        return \dirname(__DIR__);
-    }
-}
+/**
+ * Fields
+ */
+$GLOBALS['TL_DCA']['tl_module']['fields']['newsInfiniteScroll_addCanonicalTag'] = [
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "char(1) NOT NULL default ''",
+];

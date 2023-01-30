@@ -12,14 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
  */
 
-namespace Markocupic\ContaoNewsInfiniteScrollBundle;
+use Markocupic\ModuleNewslistInfiniteScroll;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-class MarkocupicContaoNewsInfiniteScrollBundle extends Bundle
-{
-    public function getPath(): string
-    {
-        return \dirname(__DIR__);
-    }
-}
+/**
+ * Frontend module
+ */
+$GLOBALS['FE_MOD']['news']['newslist_infinite_scroll'] = ModuleNewslistInfiniteScroll::class;

@@ -1,60 +1,55 @@
 <?php
 
-/**
- * Contao News Infinite Scroll Bundle
+declare(strict_types=1);
+
+/*
+ * This file is part of Contao News Infinite Scroll Bundle.
  *
- * Copyright (c) 2021 Marko Cupic
- *
- * @author Marko Cupic <https://github.com/markocupic/contao-news-infinite-scroll-bundle>
- *
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license LGPL-3.0+
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
  */
 
 namespace Markocupic\ContaoNewsInfiniteScrollBundle\EventListener\Contao;
 
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\Input;
 use Contao\Module;
-use Contao\Environment;
-use Contao\System;
 
-/**
- * Class ParseArticlesListener
- *
- * @package Markocupic\ContaoNewsInfiniteScrollBundle\EventListener\Contao
- */
+#[AsHook(ParseArticlesListener::HOOK)]
 class ParseArticlesListener
 {
+    public const HOOK = 'parseArticles';
+
+    public function __construct(
+        private readonly ContaoFramework $framework,
+    ) {
+    }
 
     /**
-     * @param FrontendTemplate $template
-     * @param array $newsEntry
-     * @param Module $module
+     * Add canonical tag.
      */
-    public function addCanonicalTag(FrontendTemplate $template, array $newsEntry, Module $module): void
+    public function __invoke(FrontendTemplate $template, array $newsEntry, Module $module): void
     {
-
         // Prevent duplicate content by adding the canonical url into the head.
-        if ($module->type === 'newslist_infinite_scroll' && $module->newsInfiniteScroll_addCanonicalTag)
-        {
-            $id = 'page_n' . $module->id;
+        if ('newslist_infinite_scroll' === $module->type && $module->newsInfiniteScroll_addCanonicalTag) {
+            $id = 'page_n'.$module->id;
 
-            /** @var ContaoFramework $framework */
-            $framework = System::getContainer()->get('contao.framework');
+            $environmentAdapter = $this->framework->getAdapter(Environment::class);
 
-            /** @var Environment $environmentAdapter */
-            $environmentAdapter = $framework->getAdapter(Environment::class);
-
-            $strTag = sprintf('<link rel="canonical" href="%s">',
-                $environmentAdapter->get('url') . '/' . str_replace('?' . $environmentAdapter->get('queryString'), '', $environmentAdapter->get('request'))
+            $strTag = sprintf(
+                '<link rel="canonical" href="%s">',
+                $environmentAdapter->get('url').'/'.str_replace('?'.$environmentAdapter->get('queryString'), '', $environmentAdapter->get('request'))
             );
 
-            /** @var Input $inputAdaper */
-            $inputAdaper = $framework->getAdapter(Input::class);
+            $inputAdapter = $this->framework->getAdapter(Input::class);
 
-            if ($inputAdaper->get($id) !== null && is_array($GLOBALS['TL_HEAD']) && !in_array($strTag, $GLOBALS['TL_HEAD']))
-            {
+            if (null !== $inputAdapter->get($id) && isset($GLOBALS['TL_HEAD']) && \is_array($GLOBALS['TL_HEAD']) && !\in_array($strTag, $GLOBALS['TL_HEAD'], true)) {
                 $GLOBALS['TL_HEAD'][] = $strTag;
             }
         }

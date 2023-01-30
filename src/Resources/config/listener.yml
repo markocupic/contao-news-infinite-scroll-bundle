@@ -1,9 +1,0 @@
-services:
-
-  # CONTAO HOOKS:
-  # Contao add parse articles hook
-  Markocupic\ContaoNewsInfiniteScrollBundle\EventListener\Contao\ParseArticlesListener:
-    public: true
-    tags:
-    - { name: kernel.event_listener, event: contao.parse_articles, method: addCanonicalTag }
-

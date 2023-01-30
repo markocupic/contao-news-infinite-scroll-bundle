@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+    bind:
+
+
+  Markocupic\ContaoNewsInfiniteScrollBundle\:
+    resource: ../src/
+    exclude: ../src/{DependencyInjection}

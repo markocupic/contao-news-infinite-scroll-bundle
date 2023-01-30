@@ -1,43 +1,41 @@
 {
-  "name": "markocupic/contao-news-infinite-scroll-bundle",
-  "type": "contao-bundle",
-  "description": "Add Infinite Scroll to the Contao Newslist Module",
-  "keywords": [
-    "contao",
-    "infinite",
-    "scroll",
-    "newslist",
-    "news"
-  ],
-  "license": "LGPL-3.0+",
-  "authors": [
-    {
-      "name": "Marko Cupic",
-      "homepage": "https://github.com/markocupic/contao-news-infinite-scroll-bundle"
-    }
-  ],
-  "require": {
-    "contao/core-bundle": "^4.4 || ^5.0",
-    "symfony/config": "^3.4 || ^4.4 || ^5.0",
-    "symfony/dependency-injection": "^3.4 || ^4.4 || ^5.0",
-    "symfony/http-foundation": "^3.4 || ^4.4 || ^5.0",
-    "symfony/http-kernel": "^3.4 || ^4.4 || ^5.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "Markocupic\\ContaoNewsInfiniteScrollBundle\\": "src/"
-    },
-    "classmap": [
-      "src/Resources/contao/"
+    "name": "markocupic/contao-news-infinite-scroll-bundle",
+    "type": "contao-bundle",
+    "description": "Add Infinite Scroll to the Contao Newslist Module",
+    "keywords": [
+        "contao",
+        "infinite",
+        "scroll",
+        "newslist",
+        "news"
     ],
-    "exclude-from-classmap": [
-      "src/Resources/contao/config/",
-      "src/Resources/contao/dca/",
-      "src/Resources/contao/languages/",
-      "src/Resources/contao/templates/"
-    ]
-  },
-  "extra": {
-    "contao-manager-plugin": "Markocupic\\ContaoNewsInfiniteScrollBundle\\ContaoManager\\Plugin"
-  }
+    "license": "LGPL-3.0+",
+    "authors": [
+        {
+            "name": "Marko Cupic",
+            "homepage": "https://github.com/markocupic/contao-news-infinite-scroll-bundle"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "contao/core-bundle": "^4.13 || ^5.0",
+        "contao/calendar-bundle": "^4.13 || ^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Markocupic\\ContaoNewsInfiniteScrollBundle\\": "src/"
+        },
+        "classmap": [
+            "contao/"
+        ],
+        "exclude-from-classmap": [
+            "contao/config/",
+            "contao/dca/",
+            "contao/languages/",
+            "templates/"
+        ]
+    },
+    "extra": {
+        "contao-manager-plugin": "Markocupic\\ContaoNewsInfiniteScrollBundle\\ContaoManager\\Plugin"
+    }
 }

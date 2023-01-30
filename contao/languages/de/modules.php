@@ -12,14 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
  */
 
-namespace Markocupic\ContaoNewsInfiniteScrollBundle;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-class MarkocupicContaoNewsInfiniteScrollBundle extends Bundle
-{
-    public function getPath(): string
-    {
-        return \dirname(__DIR__);
-    }
-}
+/**
+ * Frontend modules
+ */
+$GLOBALS['TL_LANG']['FMD']['newslist_infinite_scroll'] = ['Newslist Infinite Scroll', 'Lädt Artikel einer Newsliste mit der infinite scroll Methode per Ajax-Request nach.'];

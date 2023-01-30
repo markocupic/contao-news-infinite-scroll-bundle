@@ -1,13 +1,15 @@
 <?php
 
-/**
- * Contao News Infinite Scroll Bundle
+declare(strict_types=1);
+
+/*
+ * This file is part of Contao News Infinite Scroll Bundle.
  *
- * Copyright (c) 2021 Marko Cupic
- *
- * @author Marko Cupic <https://github.com/markocupic/contao-news-infinite-scroll-bundle>
- *
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license LGPL-3.0+
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
  */
 
 namespace Markocupic\ContaoNewsInfiniteScrollBundle\ContaoManager;
@@ -15,26 +17,17 @@ namespace Markocupic\ContaoNewsInfiniteScrollBundle\ContaoManager;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
-use SomeVendor\ContaoExampleBundle\ContaoExampleBundle;
+use Contao\NewsBundle\ContaoNewsBundle;
+use Markocupic\ContaoNewsInfiniteScrollBundle\MarkocupicContaoNewsInfiniteScrollBundle;
 
-/**
- * Class Plugin
- *
- * @package Markocupic\ContaoNewsInfiniteScrollBundle\ContaoManager
- */
 class Plugin implements BundlePluginInterface
 {
-    /**
-     * @param ParserInterface $parser
-     * @return array
-     */
     public function getBundles(ParserInterface $parser): array
     {
-
         return [
-            BundleConfig::create('Markocupic\ContaoNewsInfiniteScrollBundle\MarkocupicContaoNewsInfiniteScrollBundle')
+            BundleConfig::create(MarkocupicContaoNewsInfiniteScrollBundle::class)
                 ->setLoadAfter([
-                    'Contao\NewsBundle\ContaoNewsBundle',
+                    ContaoNewsBundle::class,
                 ]),
         ];
     }

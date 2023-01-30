@@ -12,14 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
  */
 
-namespace Markocupic\ContaoNewsInfiniteScrollBundle;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-class MarkocupicContaoNewsInfiniteScrollBundle extends Bundle
-{
-    public function getPath(): string
-    {
-        return \dirname(__DIR__);
-    }
-}
+/**
+ * Miscellaneous
+ */
+$GLOBALS['TL_LANG']['MSC']['infScrLoadMore'] = 'Load more articles';
+$GLOBALS['TL_LANG']['MSC']['infScrLoadingInProcess'] = 'Loading in process';

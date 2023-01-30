@@ -4,7 +4,7 @@
 Dieses Frontend-Modul für [Contao CMS](https://contao.org) ermöglicht das Nachladen von Newsartikeln nach domready.
  Sobald ein im Template definierter Anker durch Scrollen erreicht wird,
  werden automatisch/manuell per Ajax die weiteren News-Artikel nachgeladen.
- 
+
 ## Installation
 Per Contao Manager oder über die Konsole mit
 ```bash
@@ -19,11 +19,11 @@ Damit das Modul funktioniert, muss die Paginierung in der Moduleinstellung aktiv
 
 ## Einstellungen
 Um die Standardeinstellungen im Template
- `vendor\markocupic\contao-news-infinite-scroll-bundle\src\Resources\contao\templates\jquery\j_news_infinite_scroll.html5`
+ `vendor\markocupic\contao-news-infinite-scroll-bundle\contao\templates\jquery\j_news_infinite_scroll.html5`
  updatesicher zu überschreiben, legen Sie ein neues Template in `templates/j_news_infinite_scroll.html5` an.
- 
+
 https://user-images.githubusercontent.com/1525166/145197724-8bf6fa5b-79ad-49c9-93d7-6af45d37d721.mp4
 
 
-  
+
 

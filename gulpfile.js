@@ -8,13 +8,13 @@ const rename = require('gulp-rename');
 
 function js() {
   return gulp
-    .src(['src/Resources/public/js/*.js', '!src/Resources/public/js/*.min.js'])
+    .src(['public/js/*.js', '!public/js/*.min.js'])
     .pipe(plumber())
     .pipe(rename({ suffix: '.min' }))
     .pipe(sourcemaps.init())
     .pipe(uglify())
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('src/Resources/public/js/'))
+    .pipe(gulp.dest('public/js/'))
   ;
 }
 
