@@ -1,0 +1,84 @@
+<script src="bundles/markocupiccontaonewsinfinitescroll/js/contao_infinite_scroll.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const infiniteScrollNewsModuleSelector = '.mod_newslist_infinite_scroll > .infinite_scroll_newslist_container';
+
+        document.querySelectorAll(infiniteScrollNewsModuleSelector).forEach((listItemContainer) => {
+            /**
+             * @type {ContaoInfiniteScrollApp}
+             */
+            const app = new ContaoInfiniteScrollApp(listItemContainer, {
+                loadingMode: ContaoInfiniteScroll.Modes.LOAD_MORE_BUTTON,
+
+                {#
+                // DOM element: Element|null
+                // Set the scroll container to null (default) if you want to use the whole scren as scroll area
+                // Use document.querySelector('#scrollArea') if you prefer a custom scroll area
+                scrollContainer: null,
+
+                // The urls are retrieved from the pagination. Specify the css selectors from the pagination inside container
+                pagination: {
+                    selectorNext: '.pagination > .next > a.next[href]',
+                    selectorLast: '.pagination > .last > a.last[href]',
+                    paramPageRegex: 'page([_a-z]*)(\d*)',
+                }
+                -#}
+
+                // Loading in process indicator markup
+                loadingInProcessIndicatorMarkup: '<div class="inf-scr-loading-in-process-container">{{ "MSC.infScrLoadingInProcess"|trans([], "contao_default") }}...</div>',
+
+                // Load more button markup
+                loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container"><button>{{ "MSC.infScrLoadMore"|trans([], "contao_default") }}</button></div>',
+            });
+
+            app.on('contao.infinite_scroll.initialize', (instance) => {
+                {#  Hide pagination -#}
+                instance.getContainer().querySelectorAll('nav.block:has(.pagination)').forEach(function (element) {
+                    if (element) {
+                        element.style.display = 'none';
+                    }
+                });
+
+                // Return false will abort the initialization
+                return true;
+            });
+
+            {#
+            app.on('contao.infinite_scroll.xhr_start', (instance, currentUrl) => {
+                // Do something
+            });
+            -#}
+
+            {#
+            app.on('contao.infinite_scroll.xhr_complete', (instance, responseText) => {
+                // Do something and return the html markup
+                return responseText;
+            });
+            -#}
+
+            {#
+            app.on('contao.infinite_scroll.xhr_error', (instance, error) => {
+                // Do something
+                console.warn(error);
+            });
+            -#}
+
+            {#
+            app.on('contao.infinite_scroll.append', (instance, documentFragment) => {
+                // Do something
+                return documentFragment;
+            });
+            -#}
+
+            {#
+            app.on('contao.infinite_scroll.appended', (instance) => {
+                // Do something
+            });
+            -#}
+            app.execute();
+        }, false);
+    });
+
+</script>

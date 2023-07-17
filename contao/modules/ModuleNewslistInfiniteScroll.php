@@ -18,9 +18,12 @@ use Contao\Environment;
 use Contao\Input;
 use Contao\ModuleNewsList;
 use Contao\System;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ModuleNewslistInfiniteScroll extends ModuleNewsList
 {
+    protected bool $ajaxCall = false;
+
     /**
      * Display a wildcard in the back end
      */
@@ -41,14 +44,14 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
 
         // Do not add the page to the search index on ajax calls
         // Send articles without a frame to the browser
+
         if ($this->isAjaxRequest()) {
+            $this->ajaxCall = true;
             global $objPage;
             $objPage->noSearch;
 
-            $this->strTemplate = 'mod_newslist_infinite_scroll';
-        } else {
-            // Load JavaScript
-            $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaonewsinfinitescroll/js/news_infinite_scroll.min.js';
+            // Load the template for ajax requests
+            $this->strTemplate = '_mod_newslist_infinite_scroll_ajax';
         }
 
         return parent::generate();
@@ -71,7 +74,13 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
             $this->Template->pagination = '';
             $this->Template->archives = $this->news_archives;
 
-            throw new ResponseException($this->Template->getResponse(true, true));
+            $json = [
+                'status' => 'success',
+                'uri'    => Environment::get('uri'),
+                'data'   => $this->Template->getResponse(true, true)->getContent(),
+            ];
+
+            throw new ResponseException(new JsonResponse($json));
         }
 
         parent::compile();

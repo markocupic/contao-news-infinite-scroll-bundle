@@ -7,7 +7,8 @@
         "infinite",
         "scroll",
         "newslist",
-        "news"
+        "news",
+        "vanilla script"
     ],
     "license": "LGPL-3.0+",
     "authors": [

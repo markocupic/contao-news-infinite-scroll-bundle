@@ -62,7 +62,7 @@ class Module
 
         if ('newslist_infinite_scroll' === $objModule->type) {
             Message::addInfo(
-                $this->translator->trans('tl_module.includeContaoNewsInfiniteScrollTemplate', ['j_news_infinite_scroll'], 'contao_default')
+                $this->translator->trans('tl_module.includeContaoNewsInfiniteScrollTemplate', ['js_news_infinite_scroll'], 'contao_default')
             );
         }
     }
