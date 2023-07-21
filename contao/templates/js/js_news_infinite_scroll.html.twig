@@ -1,11 +1,11 @@
-<script src="bundles/markocupiccontaonewsinfinitescroll/js/contao_infinite_scroll.min.js"></script>
+<script src="bundles/markocupiccontaonewsinfinitescroll/js/contao_infinite_scroll.min.js?t={{ date().timestamp }}"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
         const infiniteScrollNewsModuleSelector = '.mod_newslist_infinite_scroll > .infinite_scroll_newslist_container';
 
-        document.querySelectorAll(infiniteScrollNewsModuleSelector).forEach((listItemContainer) => {
+        for (const listItemContainer of document.querySelectorAll(infiniteScrollNewsModuleSelector)) {
             /**
              * @type {ContaoInfiniteScrollApp}
              */
@@ -26,20 +26,18 @@
                 }
                 -#}
 
-                // Loading in process indicator markup
-                loadingInProcessIndicatorMarkup: '<div class="inf-scr-loading-in-process-container">{{ "MSC.infScrLoadingInProcess"|trans([], "contao_default") }}...</div>',
-
                 // Load more button markup
-                loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container"><button>{{ "MSC.infScrLoadMore"|trans([], "contao_default") }}</button></div>',
+                loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container" role="button" tabindex="0"><span class="inf-scr-load-more-btn-inner">{{ "MSC.infScrLoadMore"|trans([], "contao_default") }}</span></div>',
+
+                // Loading in process indicator markup
+                loadingInProcessIndicatorMarkup: '<div class="inf-scr-loading-in-process-container"><span class="inf-scr-loading-in-process-inner">{{ "MSC.infScrLoadingInProcess"|trans([], "contao_default") }}</span></div>',
             });
 
             app.on('contao.infinite_scroll.initialize', (instance) => {
                 {#  Hide pagination -#}
-                instance.getContainer().querySelectorAll('nav.block:has(.pagination)').forEach(function (element) {
-                    if (element) {
-                        element.style.display = 'none';
-                    }
-                });
+                for (const elPag of instance.getContainer().querySelectorAll('nav.block:has(.pagination)')) {
+                    elPag.style.display = 'none';
+                }
 
                 // Return false will abort the initialization
                 return true;
@@ -78,7 +76,7 @@
             });
             -#}
             app.execute();
-        }, false);
+        }
     });
 
 </script>

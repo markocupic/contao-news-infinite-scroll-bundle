@@ -35,11 +35,11 @@ ContaoInfiniteScroll.Defaults = {
         paramPageRegex: 'page([_a-z]*)(\d*)',
     },
 
-    // Load more button html markup
-    loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container"><button>load more</button></div>',
+    // Load more button markup
+    loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container" role="button" tabindex="0"><span class="inf-scr-load-more-btn-inner">load more content</span></div>',
 
     // HTML: Show this message during the loading process
-    loadingInProcessIndicatorMarkup: '<div class="inf-scr-loading-in-process-container">loading...</div>',
+    loadingInProcessIndicatorMarkup: '<div class="inf-scr-loading-in-process-container"><span class="inf-scr-loading-in-process-inner">loading...</span></div>',
 }
 
 /**
@@ -173,9 +173,9 @@ class ContaoInfiniteScrollApp {
 
         // Handle various loading modes
         if (this.#loadingMode === ContaoInfiniteScroll.Modes.AUTOLOAD_ON_DOMREADY) {
-            this.#load();
+            this.load();
             this.#xhrInterval = setInterval(() => {
-                this.#load()
+                this.load()
             }, 3000);
 
         } else if (this.#loadingMode === ContaoInfiniteScroll.Modes.LOAD_MORE_BUTTON) {
@@ -194,12 +194,12 @@ class ContaoInfiniteScrollApp {
             const observer = new IntersectionObserver((entries) => {
                 // Callback to be fired
                 // Entries is a list of elements out of our targets that reported a change.
-                entries.forEach((entry) => {
+                for (const entry of entries) {
                     // Only add to list if element is coming into view not leaving
                     if (entry.isIntersecting) {
-                        this.#load();
+                        this.load();
                     }
-                });
+                }
             }, options);
 
             observer.observe(this.#anchorPoint);
@@ -248,69 +248,9 @@ class ContaoInfiniteScrollApp {
     }
 
     /**
-     * @param listItemsContainer
-     * @param options
-     * @returns {ContaoInfiniteScrollApp.initialize}
-     */
-    #initialize = function (listItemsContainer, options) {
-
-        this.#container = listItemsContainer;
-
-        this.#opts = {
-            ...ContaoInfiniteScroll.Defaults,
-            ...options ?? {},
-        }
-
-        // Set the loading mode
-        this.#loadingMode = this.#opts['loadingMode'];
-
-        if (!Object.values(ContaoInfiniteScroll.Modes).includes(this.#loadingMode)) {
-            throw new Error(this.#loadingMode + ' is not a valid loading mode. Please choose one of these: "' + Object.values(ContaoInfiniteScroll.Modes).join('", ') + '".');
-        }
-
-        // Retrieve urls from pagination
-        this.arrUrls = ContaoInfiniteScroll.Utils.getUrlsFromPagination(
-            this.#container.querySelector(this.#opts['pagination']['selectorNext']),
-            this.#container.querySelector(this.#opts['pagination']['selectorLast']),
-            this.#opts['pagination']['paramPageRegex'],
-        );
-
-        // Set the anchor point
-        this.#anchorPoint = this.#container.parentElement.querySelector('.infinite_scroll_anchor');
-
-        return this;
-    };
-
-    /**
-     *
-     * @param strEventName
-     * @param args
-     * @returns {*}
-     */
-    #dispatchEvent = function (strEventName, args = []) {
-
-        let returnValue;
-
-        for (let index = 0; index < this.#listeners[strEventName].length; index++) {
-            returnValue = this.#listeners[strEventName][index](...args)
-        }
-
-        return returnValue;
-    }
-
-    /**
-     * @param strEventName
-     * @returns {boolean}
-     */
-    #hasListener = function (strEventName) {
-
-        return this.#listeners[strEventName].length > 0;
-    }
-
-    /**
      * Load items from server
      */
-    #load = function () {
+    load = function () {
 
         if (this.#blnLoadingInProcess === true || this.#blnAllItemsLoaded === true) {
             return;
@@ -415,6 +355,66 @@ class ContaoInfiniteScrollApp {
     };
 
     /**
+     * @param listItemsContainer
+     * @param options
+     * @returns {ContaoInfiniteScrollApp.initialize}
+     */
+    #initialize = function (listItemsContainer, options) {
+
+        this.#container = listItemsContainer;
+
+        this.#opts = {
+            ...ContaoInfiniteScroll.Defaults,
+            ...options ?? {},
+        }
+
+        // Set the loading mode
+        this.#loadingMode = this.#opts['loadingMode'];
+
+        if (!Object.values(ContaoInfiniteScroll.Modes).includes(this.#loadingMode)) {
+            throw new Error(this.#loadingMode + ' is not a valid loading mode. Please choose one of these: "' + Object.values(ContaoInfiniteScroll.Modes).join('", ') + '".');
+        }
+
+        // Retrieve urls from pagination
+        this.arrUrls = ContaoInfiniteScroll.Utils.getUrlsFromPagination(
+            this.#container.querySelector(this.#opts['pagination']['selectorNext']),
+            this.#container.querySelector(this.#opts['pagination']['selectorLast']),
+            this.#opts['pagination']['paramPageRegex'],
+        );
+
+        // Set the anchor point
+        this.#anchorPoint = this.#container.parentElement.querySelector('.infinite_scroll_anchor');
+
+        return this;
+    };
+
+    /**
+     *
+     * @param strEventName
+     * @param args
+     * @returns {*}
+     */
+    #dispatchEvent = function (strEventName, args = []) {
+
+        let returnValue;
+
+        for (let index = 0; index < this.#listeners[strEventName].length; index++) {
+            returnValue = this.#listeners[strEventName][index](...args)
+        }
+
+        return returnValue;
+    }
+
+    /**
+     * @param strEventName
+     * @returns {boolean}
+     */
+    #hasListener = function (strEventName) {
+
+        return this.#listeners[strEventName].length > 0;
+    }
+
+    /**
      * @param errorMsg
      */
     #handleAjaxError = function (errorMsg = '') {
@@ -467,10 +467,22 @@ class ContaoInfiniteScrollApp {
             loadMoreBtn.setAttribute('data-display', loadMoreBtn.style.display !== '' ? loadMoreBtn.style.display : 'block');
 
             // Hide the button during the loading process
-            loadMoreBtn.addEventListener('click', e => {
-                loadMoreBtn.style.display = 'none';
-                this.#load();
-            });
+            const events = ['click', 'keydown'];
+            for (const event of events) {
+                loadMoreBtn.addEventListener(event, e => {
+                    if (e.type === 'keydown' && e.keyCode !== 13) {
+                        // Only react on "ENTER"
+                        e.stopPropagation();
+                        return;
+                    }
+
+                    loadMoreBtn.style.display = 'none';
+                    this.load();
+                }, {
+                    'once': true,
+                });
+            }
+
         }
     }
 
@@ -498,8 +510,8 @@ class ContaoInfiniteScrollApp {
 
     #removeLoadingIndicator = function () {
         const indicators = this.#container.parentElement.querySelectorAll('.inf-scr-loading-in-process-indicator');
-        indicators.forEach((el) => {
-            el.remove();
-        });
+        for (const indicator of indicators) {
+            indicator.remove();
+        }
     }
 }
