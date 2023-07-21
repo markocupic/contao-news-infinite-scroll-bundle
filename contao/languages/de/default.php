@@ -15,5 +15,5 @@ declare(strict_types=1);
 /**
  * Miscellaneous
  */
-$GLOBALS['TL_LANG']['MSC']['infScrLoadMore'] = 'Weitere Beiträge laden';
-$GLOBALS['TL_LANG']['MSC']['infScrLoadingInProcess'] = 'Lade';
+$GLOBALS['TL_LANG']['MSC']['infScrLoadMore'] = 'Mehr Inhalte laden';
+$GLOBALS['TL_LANG']['MSC']['infScrLoadingInProcess'] = 'Lade...';
