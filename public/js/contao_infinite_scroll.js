@@ -173,7 +173,10 @@ class ContaoInfiniteScrollApp {
 
         // Handle various loading modes
         if (this.#loadingMode === ContaoInfiniteScroll.Modes.AUTOLOAD_ON_DOMREADY) {
+
+            // Load more items
             this.load();
+
             this.#xhrInterval = setInterval(() => {
                 this.load()
             }, 3000);
@@ -185,8 +188,10 @@ class ContaoInfiniteScrollApp {
             const options = {
                 // Set root to null to use the whole screen as scroll area
                 root: this.#scrollContainer,
+
                 // Do not grow or shrink the root area
                 rootMargin: "0px",
+
                 // Threshold of 1.0 will fire callback when 100% of element is visible
                 threshold: 1.0
             };
@@ -197,6 +202,8 @@ class ContaoInfiniteScrollApp {
                 for (const entry of entries) {
                     // Only add to list if element is coming into view not leaving
                     if (entry.isIntersecting) {
+
+                        // Load more items
                         this.load();
                     }
                 }
@@ -250,13 +257,14 @@ class ContaoInfiniteScrollApp {
     /**
      * Load items from server
      */
-    load = function () {
+    load = async function () {
+
+        this.blnHasError = false;
+        let responseText = '';
 
         if (this.#blnLoadingInProcess === true || this.#blnAllItemsLoaded === true) {
             return;
         }
-
-        this.blnHasError = false;
 
         let currentUrl = this.arrUrls[this.urlIndex];
 
@@ -274,83 +282,90 @@ class ContaoInfiniteScrollApp {
                 this.#dispatchEvent('contao.infinite_scroll.xhr_start', [this, currentUrl]);
             }
 
-            fetch(currentUrl, {
-                method: "GET",
-                headers: {
-                    'x-requested-with': 'XMLHttpRequest',
-                },
-            }).then(response => {
-                if (response.ok) {
-                    return response.json();
+            try {
+                const response = await fetch(currentUrl, {
+                    method: "GET",
+                    headers: {
+                        'x-requested-with': 'XMLHttpRequest',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw `An error has occurred: ${response.status}`;
                 }
 
-                return Promise.reject(response);
-            }).then(json => {
-                if (json['data'] === 'undefined') {
-                    return Promise.reject(json);
-                }
-                return json['data'];
-            }).then(responseText => {
-                this.blnHasError = false;
+                const json = await response.json();
 
-                if (typeof responseText === 'string') {
-                    // Dispatch 'contao.infinite_scroll.xhr_complete' event
-                    if (this.#hasListener('contao.infinite_scroll.xhr_complete')) {
-                        responseText = this.#dispatchEvent('contao.infinite_scroll.xhr_complete', [this, responseText]);
-                    }
-                } else {
-                    return Promise.reject('Response data is not of type string.');
+                if (typeof json.status !== 'string' || json.status !== 'success') {
+                    throw `Something went wrong. Status: ${json.status}.`;
                 }
 
-                if (this.blnHasError === false) {
-                    this.urlIndex++;
-                    setTimeout(() => {
-                        // Append the loaded content to the DOM
-                        this.#appendItemsToContainer(responseText);
-                    }, 1000);
-                } else {
-                    return Promise.reject(response);
+                responseText = json.data;
+
+            } catch (error) {
+                // Set aria-busy property to false
+                this.#container.setAttribute('aria-busy', 'false');
+
+                // Remove the "loading in progress indicator"
+                this.#removeLoadingIndicator();
+
+                // Again append the load more button to the DOM
+                if (this.#loadingMode === ContaoInfiniteScroll.Modes.LOAD_MORE_BUTTON) {
+                    this.#appendLoadMoreButtonAfterContainer();
                 }
-            }).catch(function (error) {
-                console.warn(error);
+
+                this.#blnLoadingInProcess = false;
+
                 this.#handleAjaxError(error);
-            }).finally(() => {
-                setTimeout(() => {
-                    // Set aria-busy property to false
-                    this.#container.setAttribute('aria-busy', 'false');
 
-                    // Remove the "loading in progress indicator"
-                    this.#removeLoadingIndicator();
-
-                    // If all items are loaded:
-                    if (this.arrUrls.length === this.urlIndex) {
-
-                        this.#blnAllItemsLoaded = true;
-
-                        // Remove the "load more button"
-                        this.#removeLoadMoreButton();
-
-                        // Clear the autoloader interval
-                        if (typeof this.#xhrInterval !== 'undefined') {
-                            clearInterval(this.#xhrInterval);
-                        }
-                    } else {
-                        // Again append the load more button to the DOM
-                        if (this.#loadingMode === ContaoInfiniteScroll.Modes.LOAD_MORE_BUTTON) {
-                            this.#appendLoadMoreButtonAfterContainer();
-                        }
-                    }
-
-                    this.#blnLoadingInProcess = false;
-
-                }, 1000);
-            });
-
-        } else {
-            this.#blnAllItemsLoaded = true;
-            if (typeof this.#xhrInterval !== 'undefined') {
-                clearInterval(this.#xhrInterval);
+                throw new Error(error);
             }
+
+            // Dispatch 'contao.infinite_scroll.xhr_complete' event
+            if (this.#hasListener('contao.infinite_scroll.xhr_complete')) {
+                responseText = this.#dispatchEvent('contao.infinite_scroll.xhr_complete', [this, responseText]);
+            }
+
+            if (this.blnHasError === false) {
+                this.urlIndex++;
+
+                await new Promise(resolve => {
+                    setTimeout(() => {
+                        // Append the loaded content to the DOM and use a little timeout
+                        this.#appendItemsToContainer(responseText);
+
+                        resolve();
+                    }, 1000);
+                });
+            }
+
+            // Set aria-busy property to false
+            this.#container.setAttribute('aria-busy', 'false');
+
+            // Remove the "loading in progress indicator"
+            this.#removeLoadingIndicator();
+
+            // If all items are loaded:
+            if (this.arrUrls.length === this.urlIndex) {
+
+                this.#blnAllItemsLoaded = true;
+
+                // Remove the "load more button"
+                this.#removeLoadMoreButton();
+
+                // Clear the autoloader interval
+                if (typeof this.#xhrInterval !== 'undefined') {
+                    clearInterval(this.#xhrInterval);
+                }
+            } else {
+                // Again append the load more button to the DOM
+                if (this.#loadingMode === ContaoInfiniteScroll.Modes.LOAD_MORE_BUTTON) {
+                    this.#appendLoadMoreButtonAfterContainer();
+                }
+            }
+
+            this.#blnLoadingInProcess = false;
+
         }
     };
 
@@ -477,6 +492,8 @@ class ContaoInfiniteScrollApp {
                     }
 
                     loadMoreBtn.style.display = 'none';
+
+                    // Load more items
                     this.load();
                 }, {
                     'once': true,

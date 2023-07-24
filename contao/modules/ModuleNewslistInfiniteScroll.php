@@ -49,7 +49,7 @@ class ModuleNewslistInfiniteScroll extends ModuleNewsList
         if ($this->isAjaxRequest()) {
             $this->ajaxCall = true;
             global $objPage;
-            $objPage->noSearch;
+            $objPage->noSearch = 1;
 
             // Load the template for ajax requests
             $this->strTemplate = '_mod_newslist_infinite_scroll_ajax';
