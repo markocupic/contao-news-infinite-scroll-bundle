@@ -3,7 +3,7 @@
 /*
  * This file is part of Contao News Infinite Scroll Bundle.
  *
- * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
  * @license LGPL-3.0+
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
