@@ -3,7 +3,7 @@
 /*
  * This file is part of Contao News Infinite Scroll Bundle.
  *
- * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
  * @license LGPL-3.0+
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -60,8 +60,15 @@ ContaoInfiniteScroll.Utils = {
         let arrUrls = [];
 
         // Get the first request url
-        // Use el.getAttribute('href') because an empty href attribute will return true, when testing against el.hasAttribute('href'))
-        const hrefNext = elNextLink.getAttribute('href') ? window.location.origin + '/' + elNextLink.getAttribute('href') : null;
+        // Use el.getAttribute('href') because an empty href attribute
+        // will return true, when testing against el.hasAttribute('href'))
+        let hrefNext = elNextLink.getAttribute('href');
+
+        // ltrim slashes
+        hrefNext = hrefNext ? hrefNext.replace(new RegExp("^\\/"), "") : null;
+
+        // Prepend window.location.origin
+        hrefNext = hrefNext ? window.location.origin + '/' + hrefNext : null;
 
         if (null === hrefNext) {
             console.warn('Infinite scroll initialization aborted! Could not find a valid pagination link.');
