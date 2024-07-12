@@ -37,7 +37,7 @@
             app.on('contao.infinite_scroll.initialize', (instance) => {
 
                 {#  Hide pagination -#}
-                for (const elPag of instance.getContainer().querySelectorAll('nav.block .pagination, nav.block > p:first-child')) {
+                for (const elPag of instance.getContainer().querySelectorAll('nav.block')) {
                     elPag.style.display = 'none';
                 }
 
