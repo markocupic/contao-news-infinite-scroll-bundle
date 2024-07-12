@@ -30,8 +30,8 @@ ContaoInfiniteScroll.Defaults = {
 
     // The urls are retrieved from the pagination. Specify the css selectors from the pagination inside the container.
     pagination: {
-        selectorNext: '.pagination > .next > a.next[href]',
-        selectorLast: '.pagination > .last > a.last[href]',
+        selectorNext: 'nav.pagination li.next > a.next[href]',
+        selectorLast: 'nav.pagination li.last > a.last[href]',
         paramPageRegex: 'page([_a-z]*)(\d*)',
     },
 
@@ -395,6 +395,11 @@ class ContaoInfiniteScrollApp {
 
         if (!Object.values(ContaoInfiniteScroll.Modes).includes(this.#loadingMode)) {
             throw new Error(this.#loadingMode + ' is not a valid loading mode. Please choose one of these: "' + Object.values(ContaoInfiniteScroll.Modes).join('", ') + '".');
+        }
+
+        if (!this.#container.querySelector(this.#opts['pagination']['selectorNext'])) {
+            console.log('Infinite Scroll initialization process stopped because no url could be found in the pagination. The urls are needed to load further news items. Please check your pagination configuration inside your js_news_infinite_scroll.html.twig.');
+            return;
         }
 
         // Retrieve urls from pagination

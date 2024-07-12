@@ -15,14 +15,14 @@
 
                 {#
                 // DOM element: Element|null
-                // Set the scroll container to null (default) if you want to use the whole scren as scroll area
+                // Set the scroll container to null (default) if you want to use the whole screen as scroll area
                 // Use document.querySelector('#scrollArea') if you prefer a custom scroll area
                 scrollContainer: null,
 
-                // The urls are retrieved from the pagination. Specify the css selectors from the pagination inside container
+                // The urls are retrieved from the pagination. Specify the css selectors from the pagination inside the newslist container
                 pagination: {
-                    selectorNext: '.pagination > .next > a.next[href]',
-                    selectorLast: '.pagination > .last > a.last[href]',
+                    selectorNext: 'nav.pagination li.next > a.next[href]',
+                    selectorLast: 'nav.pagination > li.last > a.last[href]',
                     paramPageRegex: 'page([_a-z]*)(\d*)',
                 }
                 -#}
@@ -37,7 +37,7 @@
             app.on('contao.infinite_scroll.initialize', (instance) => {
 
                 {#  Hide pagination -#}
-                for (const elPag of instance.getContainer().querySelectorAll('nav.block:has(.pagination)')) {
+                for (const elPag of instance.getContainer().querySelectorAll('nav.pagination')) {
                     elPag.style.display = 'none';
                 }
 
