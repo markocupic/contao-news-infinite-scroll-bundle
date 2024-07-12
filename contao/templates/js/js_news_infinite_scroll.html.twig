@@ -6,6 +6,7 @@
         const infiniteScrollNewsModuleSelector = '.mod_newslist_infinite_scroll > .infinite_scroll_newslist_container';
 
         for (const listItemContainer of document.querySelectorAll(infiniteScrollNewsModuleSelector)) {
+
             /**
              * @type {ContaoInfiniteScrollApp}
              */
@@ -34,8 +35,9 @@
             });
 
             app.on('contao.infinite_scroll.initialize', (instance) => {
+
                 {#  Hide pagination -#}
-                for (const elPag of instance.getContainer().querySelectorAll('nav.block:has(.pagination)')) {
+                for (const elPag of instance.getContainer().querySelectorAll('nav.block .pagination, nav.block > p:first-child')) {
                     elPag.style.display = 'none';
                 }
 
