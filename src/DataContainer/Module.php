@@ -21,14 +21,14 @@ use Contao\DataContainer;
 use Contao\Message;
 use Contao\ModuleModel;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Module
 {
     public function __construct(
         private readonly RequestStack $requestStack,
-        private readonly TokenInterface $token,
+        private readonly TokenStorageInterface $tokenStorage,
         private readonly TranslatorInterface $translator,
     ) {
     }
@@ -45,7 +45,7 @@ class Module
             return;
         }
 
-        $user = $this->token->getUser();
+        $user = $this->tokenStorage->getToken()?->getUser();
 
         if (!$user instanceof BackendUser) {
             return;
