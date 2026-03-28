@@ -1,7 +1,3 @@
-<?php
-
-declare(strict_types=1);
-
 /*
  * This file is part of Contao News Infinite Scroll Bundle.
  *
@@ -11,13 +7,3 @@ declare(strict_types=1);
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
  */
-
-/**
- * Fields
- */
-$GLOBALS['TL_DCA']['tl_module']['fields']['newsInfiniteScroll_addCanonicalTag'] = [
-    'exclude'   => true,
-    'inputType' => 'checkbox',
-    'eval'      => ['tl_class' => 'w50'],
-    'sql'       => ['type' => 'boolean', 'default' => false],
-];
