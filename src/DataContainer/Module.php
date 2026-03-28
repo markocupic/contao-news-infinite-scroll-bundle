@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao News Infinite Scroll Bundle.
  *
- * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license LGPL-3.0+
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -56,13 +56,13 @@ class Module
             return;
         }
 
-        if (null === ($objModule = ModuleModel::findByPk($dc->id))) {
+        if (null === ($objModule = ModuleModel::findById($dc->id))) {
             return;
         }
 
         if ('newslist_infinite_scroll' === $objModule->type) {
             Message::addInfo(
-                $this->translator->trans('tl_module.includeContaoNewsInfiniteScrollTemplate', ['js_news_infinite_scroll'], 'contao_default')
+                $this->translator->trans('tl_module.includeContaoNewsInfiniteScrollTemplate', ['js_news_infinite_scroll'], 'contao_default'),
             );
         }
     }
@@ -73,7 +73,7 @@ class Module
     #[AsCallback(table: 'tl_module', target: 'config.onload')]
     public function addFieldsToPalette(DataContainer $dc): void
     {
-        if (null === ($objModule = ModuleModel::findByPk($dc->id))) {
+        if (null === ($objModule = ModuleModel::findById($dc->id))) {
             return;
         }
 

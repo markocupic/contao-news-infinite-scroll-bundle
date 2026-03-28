@@ -23,7 +23,8 @@
         "contao/news-bundle": "^4.13 || ^5.0"
     },
     "require-dev": {
-        "symfony/webpack-encore-bundle": "^2.0"
+        "symfony/webpack-encore-bundle": "^2.0",
+        "markocupic/easy-coding-standard": "^13.0"
     },
     "autoload": {
         "psr-4": {
