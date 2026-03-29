@@ -18,35 +18,29 @@ ContaoInfiniteScroll.Modes = {
     INFINITE_SCROLL: 'infinite_scroll',
 }
 
-ContaoInfiniteScroll.Defaults = {
-
-    // Loading mode
-    loadingMode: ContaoInfiniteScroll.Modes.LOAD_MORE_BUTTON,
-
-    // DOM element scroll area (default null, if you want to use the whole screen)
-    scrollContainer: null,
-    // Use document.querySelector("#myScrollArea") if you want to specify the scroll area
-    // scrollContainer: document.querySelector("#myScrollArea"),
-
-    // The urls are retrieved from the pagination. Specify the css selectors from the pagination inside the container.
-    pagination: {
-        selectorNext: 'nav.pagination li.next > a.next[href]',
-        selectorLast: 'nav.pagination li.last > a.last[href]',
-        paramPageRegex: 'page([_a-z]*)(\d*)',
-    },
-
-    // Load more button markup
-    loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container" role="button" tabindex="0"><span class="inf-scr-load-more-btn-inner">load more content</span></div>',
-
-    // HTML: Show this message during the loading process
-    loadingInProcessIndicatorMarkup: '<div class="inf-scr-loading-in-process-container"><span class="inf-scr-loading-in-process-inner">loading...</span></div>',
+const DEFAULT_CONFIG = {
+    loadingMode: ContaoInfiniteScroll.Modes.LOAD_MORE_BUTTON, scrollContainer: null, pagination: {
+        selectorNext: 'nav.pagination li.next > a.next[href]', selectorLast: 'nav.pagination li.last > a.last[href]', paramPageRegex: 'page([_a-z]*)(\d*)',
+    }, loadMoreButtonMarkup: '<div class="inf-scr-load-more-btn-container" role="button" tabindex="0"><span class="inf-scr-load-more-btn-inner">load more content</span></div>', loadingInProcessIndicatorMarkup: '<div class="inf-scr-loading-in-process-container"><span class="inf-scr-loading-in-process-inner">loading...</span></div>',
 }
 
-/**
- *
- * @type {{getUrlsFromPagination: ((function(*, null=, *): Promise<*>)|*)}}
- */
+ContaoInfiniteScroll.Defaults = DEFAULT_CONFIG;
+
 ContaoInfiniteScroll.Utils = {
+
+    LEADING_SLASH_PATTERN: /^\//,
+
+    /**
+     * Normalizes a relative href to an absolute URL
+     * @param {string|null} href - The href attribute value
+     * @returns {string|null} Normalized absolute URL or null
+     */
+    normalizeUrl: function (href) {
+        if (!href) return null;
+
+        const normalized = href.replace(this.LEADING_SLASH_PATTERN, "");
+        return window.location.origin + '/' + normalized;
+    },
 
     /**
      * Use this method to get the urls from the pagination items
@@ -54,28 +48,18 @@ ContaoInfiniteScroll.Utils = {
      * @param elNextLink
      * @param elLastLink
      * @param paginationUrlParamRegexPattern
-     * @returns {Promise<unknown>}
+     * @returns {Array}
      */
     getUrlsFromPagination: function (elNextLink, elLastLink = null, paginationUrlParamRegexPattern) {
         let arrUrls = [];
 
-        // Get the first request url
-        // Use el.getAttribute('href') because an empty href attribute
-        // will return true, when testing against el.hasAttribute('href'))
-        let hrefNext = elNextLink.getAttribute('href');
-
-        // ltrim slashes
-        hrefNext = hrefNext ? hrefNext.replace(new RegExp("^\\/"), "") : null;
-
-        // Prepend window.location.origin
-        hrefNext = hrefNext ? window.location.origin + '/' + hrefNext : null;
+        const hrefNext = this.normalizeUrl(elNextLink.getAttribute('href'));
 
         if (null === hrefNext) {
             console.warn('Infinite scroll initialization aborted! Could not find a valid pagination link.');
             return arrUrls;
         }
 
-        // Retrieve the URL - and URLSearchParams objects from the first pagination url
         const urlNext = new URL(hrefNext);
         const urlParamsNext = urlNext.searchParams;
 
@@ -97,15 +81,10 @@ ContaoInfiniteScroll.Utils = {
         const pageIdNext = parseInt(urlParamsNext.get(paramPage));
         let pageIdLast = pageIdNext;
 
-        // If the next url is same to the last url there is no last url
         if (elLastLink) {
-
-            // Get last request url
-            // Use elLastLink.getAttribute('href') because an empty href attribute will return true, when testing against el.hasAttribute('href'))
-            const hrefLast = elLastLink.getAttribute('href') ? window.location.origin + '/' + elLastLink.getAttribute('href') : null;
+            const hrefLast = this.normalizeUrl(elLastLink.getAttribute('href'));
 
             if (null !== hrefLast) {
-                // Retrieve the URL - and URLSearchParams objects from the last pagination url
                 const urlLast = new URL(hrefLast);
                 const urlParamsLast = urlLast.searchParams;
 
@@ -115,7 +94,6 @@ ContaoInfiniteScroll.Utils = {
             }
         }
 
-        // Generate all urls from first to last
         for (let i = pageIdNext; i <= pageIdLast; i++) {
             urlParamsNext.set(paramPage, i.toString());
             arrUrls.push(urlNext.origin + urlNext.pathname + '?' + urlParamsNext.toString());
@@ -160,11 +138,7 @@ class ContaoInfiniteScrollApp {
         'contao.infinite_scroll.appended': [],
     }
 
-    /**
-     *
-     */
-    execute = function () {
-
+    execute = () => {
         // Dispatch 'contao.infinite_scroll.initialize' event
         if (this.#hasListener('contao.infinite_scroll.initialize')) {
             if (false === this.#dispatchEvent('contao.infinite_scroll.initialize', [this])) {
@@ -173,14 +147,13 @@ class ContaoInfiniteScrollApp {
             }
         }
 
-        // If there are no urls, there is nothing to load
+        // No urls found, abort!
         if (this.arrUrls.length === 0) {
             return;
         }
 
         // Handle various loading modes
         if (this.#loadingMode === ContaoInfiniteScroll.Modes.AUTOLOAD_ON_DOMREADY) {
-
             // Load more items
             this.load();
 
@@ -193,13 +166,13 @@ class ContaoInfiniteScrollApp {
 
         } else if (this.#loadingMode === ContaoInfiniteScroll.Modes.INFINITE_SCROLL) {
             const options = {
-                // Set root to null to use the whole screen as scroll area
+                // Set root to null to use the whole screen as the scroll area
                 root: this.#scrollContainer,
 
                 // Do not grow or shrink the root area
-                rootMargin: "0px",
+                rootMargin: '0px',
 
-                // Threshold of 1.0 will fire callback when 100% of element is visible
+                // Threshold of 1.0 will fire callback when 100% of the element is visible
                 threshold: 1.0
             };
 
@@ -207,9 +180,8 @@ class ContaoInfiniteScrollApp {
                 // Callback to be fired
                 // Entries is a list of elements out of our targets that reported a change.
                 for (const entry of entries) {
-                    // Only add to list if element is coming into view not leaving
+                    // Only add to the list if the element is coming into the view, not leaving.
                     if (entry.isIntersecting) {
-
                         // Load more items
                         this.load();
                     }
@@ -219,7 +191,7 @@ class ContaoInfiniteScrollApp {
             observer.observe(this.#anchorPoint);
 
         } else {
-            throw new Error(this.#loadingMode + ' is not a valid loading mode. Please choose one of these: "' + Object.values(ContaoInfiniteScroll.Modes).join('", ') + '".');
+            throw new Error(`${this.#loadingMode} is not a valid loading mode. Please choose one of these: "${Object.values(ContaoInfiniteScroll.Modes).join('", "')}".`);
         }
     }
 
@@ -230,12 +202,13 @@ class ContaoInfiniteScrollApp {
      * @param callback
      * @returns {ContaoInfiniteScrollApp.on}
      */
-    on = function (eventName, callback) {
-
+    on = (eventName, callback) => {
         if (!this.#listeners.hasOwnProperty(eventName)) {
-            throw new Error(eventName + ' is not a valid event name. Please choose one of these: "' + Object.keys(this.#listeners).join('", ') + '".');
+            const validEventNames = Object.keys(this.#listeners).join('", "');
+            const errorMessage = `${eventName} is not a valid event name. Please choose one of these: "${validEventNames}".`;
+            throw new Error(errorMessage);
         }
-
+        
         this.#listeners[eventName].push(callback);
 
         return this;
@@ -245,8 +218,7 @@ class ContaoInfiniteScrollApp {
      * @param option
      * @returns {*|boolean}
      */
-    getOption = function (option) {
-
+    getOption = (option) => {
         if (typeof this.#opts[option] !== 'undefined') {
             return this.#opts[option];
         }
@@ -257,15 +229,16 @@ class ContaoInfiniteScrollApp {
     /**
      * @returns {*}
      */
-    getContainer = function () {
+    getContainer = () => {
         return this.#container;
     }
 
     /**
-     * Load items from server
+     * Fetch more items from the server
+     *
+     * @returns {Promise<void>}
      */
-    load = async function () {
-
+    load = async () => {
         this.blnHasError = false;
         let responseText = '';
 
@@ -291,8 +264,7 @@ class ContaoInfiniteScrollApp {
 
             try {
                 const response = await fetch(currentUrl, {
-                    method: "GET",
-                    headers: {
+                    method: "GET", headers: {
                         'x-requested-with': 'XMLHttpRequest',
                     },
                 });
@@ -346,7 +318,7 @@ class ContaoInfiniteScrollApp {
                 });
             }
 
-            // Set aria-busy property to false
+            // Set the "aria-busy" property to false
             this.#container.setAttribute('aria-busy', 'false');
 
             // Remove the "loading in progress indicator"
@@ -382,19 +354,17 @@ class ContaoInfiniteScrollApp {
      * @returns {ContaoInfiniteScrollApp.initialize}
      */
     #initialize = function (listItemsContainer, options) {
-
         this.#container = listItemsContainer;
 
         this.#opts = {
-            ...ContaoInfiniteScroll.Defaults,
-            ...options ?? {},
+            ...ContaoInfiniteScroll.Defaults, ...options ?? {},
         }
 
         // Set the loading mode
         this.#loadingMode = this.#opts['loadingMode'];
 
         if (!Object.values(ContaoInfiniteScroll.Modes).includes(this.#loadingMode)) {
-            throw new Error(this.#loadingMode + ' is not a valid loading mode. Please choose one of these: "' + Object.values(ContaoInfiniteScroll.Modes).join('", ') + '".');
+            throw new Error(`${this.#loadingMode} is not a valid loading mode. Please choose one of these: "${Object.values(ContaoInfiniteScroll.Modes).join('", "')}".`);
         }
 
         if (!this.#container.querySelector(this.#opts['pagination']['selectorNext'])) {
@@ -403,11 +373,7 @@ class ContaoInfiniteScrollApp {
         }
 
         // Retrieve urls from pagination
-        this.arrUrls = ContaoInfiniteScroll.Utils.getUrlsFromPagination(
-            this.#container.querySelector(this.#opts['pagination']['selectorNext']),
-            this.#container.querySelector(this.#opts['pagination']['selectorLast']),
-            this.#opts['pagination']['paramPageRegex'],
-        );
+        this.arrUrls = ContaoInfiniteScroll.Utils.getUrlsFromPagination(this.#container.querySelector(this.#opts['pagination']['selectorNext']), this.#container.querySelector(this.#opts['pagination']['selectorLast']), this.#opts['pagination']['paramPageRegex']);
 
         // Set the anchor point
         this.#anchorPoint = this.#container.parentElement.querySelector('.infinite_scroll_anchor');
@@ -416,13 +382,11 @@ class ContaoInfiniteScrollApp {
     };
 
     /**
-     *
      * @param strEventName
      * @param args
      * @returns {*}
      */
     #dispatchEvent = function (strEventName, args = []) {
-
         let returnValue;
 
         for (let index = 0; index < this.#listeners[strEventName].length; index++) {
@@ -437,7 +401,6 @@ class ContaoInfiniteScrollApp {
      * @returns {boolean}
      */
     #hasListener = function (strEventName) {
-
         return this.#listeners[strEventName].length > 0;
     }
 
@@ -445,7 +408,6 @@ class ContaoInfiniteScrollApp {
      * @param errorMsg
      */
     #handleAjaxError = function (errorMsg = '') {
-
         this.blnHasError = true;
         this.#blnLoadingInProcess = false;
 
@@ -456,10 +418,9 @@ class ContaoInfiniteScrollApp {
     }
 
     /**
-     * Append loaded markup to the container
+     * Append the loaded HTML to the container
      */
     #appendItemsToContainer = function (responseText) {
-
         // Create document fragment from response
         const template = document.createElement("template");
         template.innerHTML = responseText;
@@ -477,11 +438,9 @@ class ContaoInfiniteScrollApp {
         if (this.#hasListener('contao.infinite_scroll.appended')) {
             this.#dispatchEvent('contao.infinite_scroll.appended', [this]);
         }
-
     }
 
-    #appendLoadMoreButtonAfterContainer = function () {
-
+    #appendLoadMoreButtonAfterContainer = () => {
         let loadMoreBtn = this.#container.querySelector('.inf-scr-load-more-btn-container');
 
         if (!loadMoreBtn) {
@@ -495,6 +454,7 @@ class ContaoInfiniteScrollApp {
 
             // Hide the button during the loading process
             const events = ['click', 'keydown'];
+
             for (const event of events) {
                 loadMoreBtn.addEventListener(event, e => {
                     if (e.type === 'keydown' && e.keyCode !== 13) {
@@ -515,16 +475,15 @@ class ContaoInfiniteScrollApp {
         }
     }
 
-    #removeLoadMoreButton = function () {
-
+    #removeLoadMoreButton = () => {
         const button = this.#container.parentNode.querySelector('.inf-scr-load-more-btn-container');
+
         if (button) {
             button.remove();
         }
     }
 
-    #appendLoadingIndicatorAfterContainer = function () {
-
+    #appendLoadingIndicatorAfterContainer = () => {
         let elLoadingIndicator = this.#container.querySelector('.inf-scr-loading-in-process-indicator');
 
         if (!elLoadingIndicator && this.#opts.loadingInProcessIndicatorMarkup !== '') {
@@ -537,8 +496,9 @@ class ContaoInfiniteScrollApp {
         }
     }
 
-    #removeLoadingIndicator = function () {
+    #removeLoadingIndicator = () => {
         const indicators = this.#container.parentElement.querySelectorAll('.inf-scr-loading-in-process-indicator');
+
         for (const indicator of indicators) {
             indicator.remove();
         }
