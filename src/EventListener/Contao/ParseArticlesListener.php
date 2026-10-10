@@ -20,15 +20,16 @@ use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\Input;
 use Contao\Module;
+use Contao\StringUtil;
+use Markocupic\ContaoNewsInfiniteScrollBundle\Module\ModuleNewslistInfiniteScroll;
 
 #[AsHook(ParseArticlesListener::HOOK)]
 class ParseArticlesListener
 {
     public const HOOK = 'parseArticles';
 
-    public function __construct(
-        private readonly ContaoFramework $framework,
-    ) {
+    public function __construct(private readonly ContaoFramework $framework)
+    {
     }
 
     /**
@@ -37,21 +38,28 @@ class ParseArticlesListener
     public function __invoke(FrontendTemplate $template, array $newsEntry, Module $module): void
     {
         // Prevent duplicate content by adding the canonical url into the head.
-        if ('newslist_infinite_scroll' === $module->type && $module->newsInfiniteScroll_addCanonicalTag) {
-            $id = 'page_n'.$module->id;
+        if (ModuleNewslistInfiniteScroll::TYPE !== $module->type || !$module->newsInfiniteScroll_addCanonicalTag) {
+            return;
+        }
 
-            $environmentAdapter = $this->framework->getAdapter(Environment::class);
+        // Only add the canonical tag on subsequent pages (e.g. ?page_n12=2)
+        if (null === $this->framework->getAdapter(Input::class)->get('page_n'.$module->id)) {
+            return;
+        }
 
-            $strTag = \sprintf(
-                '<link rel="canonical" href="%s">',
-                $environmentAdapter->get('url').'/'.str_replace('?'.$environmentAdapter->get('queryString'), '', $environmentAdapter->get('request')),
-            );
+        $environmentAdapter = $this->framework->getAdapter(Environment::class);
 
-            $inputAdapter = $this->framework->getAdapter(Input::class);
+        // Strip the query string from the current url
+        $url = $environmentAdapter->get('url').'/'.explode('?', (string) $environmentAdapter->get('request'), 2)[0];
 
-            if (null !== $inputAdapter->get($id) && isset($GLOBALS['TL_HEAD']) && \is_array($GLOBALS['TL_HEAD']) && !\in_array($strTag, $GLOBALS['TL_HEAD'], true)) {
-                $GLOBALS['TL_HEAD'][] = $strTag;
-            }
+        $strTag = \sprintf('<link rel="canonical" href="%s">', $this->framework->getAdapter(StringUtil::class)->specialcharsUrl($url));
+
+        if (!\is_array($GLOBALS['TL_HEAD'] ?? null)) {
+            $GLOBALS['TL_HEAD'] = [];
+        }
+
+        if (!\in_array($strTag, $GLOBALS['TL_HEAD'], true)) {
+            $GLOBALS['TL_HEAD'][] = $strTag;
         }
     }
 }

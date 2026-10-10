@@ -12,9 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-news-infinite-scroll-bundle
  */
 
-use Markocupic\ModuleNewslistInfiniteScroll;
+use Markocupic\ContaoNewsInfiniteScrollBundle\Module\ModuleNewslistInfiniteScroll;
 
-/**
- * Frontend module
- */
-$GLOBALS['FE_MOD']['news']['newslist_infinite_scroll'] = ModuleNewslistInfiniteScroll::class;
+// Front end modules
+$GLOBALS['FE_MOD']['news'][ModuleNewslistInfiniteScroll::TYPE] = ModuleNewslistInfiniteScroll::class;

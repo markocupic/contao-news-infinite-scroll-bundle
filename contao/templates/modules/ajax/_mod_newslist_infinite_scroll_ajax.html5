@@ -1,6 +1,0 @@
-<?php if (empty($this->articles)): ?>
-<p class="empty"><?= $this->empty ?></p>
-<?php else: ?>
-<?= implode('', $this->articles) ?>
-<?= $this->pagination ?>
-<?php endif; ?>

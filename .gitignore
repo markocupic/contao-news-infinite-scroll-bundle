@@ -1,3 +1,9 @@
+/.idea/
 /node_modules/
 /package-lock.json
-/.idea/*
+/vendor/
+/composer.lock
+/tools/*/vendor/
+/tools/*/composer.lock
+/.phpunit.result.cache
+/.phpunit.cache/

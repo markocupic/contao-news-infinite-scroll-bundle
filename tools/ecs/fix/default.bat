@@ -10,4 +10,4 @@ cd..
 cd..
 cd..
 
-../../../vendor\bin\ecs check src --fix --config tools/ecs/config/default.php
+../../../vendor\bin\ecs check --fix --config tools/ecs/config/default.php

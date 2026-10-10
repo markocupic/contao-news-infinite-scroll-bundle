@@ -1,0 +1,5 @@
+{% if not articles %}
+    <p class="empty">{{ empty }}</p>
+{% else %}
+    {{ articles|join|raw }}
+{% endif %}

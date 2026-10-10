@@ -1,6 +1,6 @@
 <script src="{{ asset('js/contao_infinite_scroll.js', 'markocupic_contao_news_infinite_scroll') }}"></script>
 
-<script>
+<script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
     document.addEventListener('DOMContentLoaded', function () {
 
         const infiniteScrollNewsModuleSelector = '.mod_newslist_infinite_scroll > .infinite_scroll_newslist_container';

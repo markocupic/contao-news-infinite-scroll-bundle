@@ -1,8 +1,8 @@
-# Go to the project directory first
+# Go to the bundle directory first
 cd vendor/markocupic/contao-news-infinite-scroll-bundle
 
-# Update project files (builds the node_modules directory)
-npm update
+# Install the node modules
+npm install
 
 # Build assets
 npm run build

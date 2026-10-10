@@ -1,0 +1,13 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+    <div class="infinite_scroll_newslist_container row">
+        {% if not articles %}
+            <p class="empty">{{ empty }}</p>
+        {% else %}
+            {{ articles|join|raw }}
+            {{ pagination|default|raw }}
+        {% endif %}
+    </div>
+    <div class="infinite_scroll_anchor" style="visibility: hidden"></div>
+{% endblock %}

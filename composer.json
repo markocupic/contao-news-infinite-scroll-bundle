@@ -1,6 +1,5 @@
 {
     "name": "markocupic/contao-news-infinite-scroll-bundle",
-    "type": "contao-bundle",
     "description": "Add Infinite Scroll to the Contao Newslist Module",
     "keywords": [
         "contao",
@@ -10,37 +9,63 @@
         "news",
         "vanilla script"
     ],
-    "license": "LGPL-3.0+",
+    "type": "contao-bundle",
+    "license": "LGPL-3.0-or-later",
     "authors": [
         {
             "name": "Marko Cupic",
-            "homepage": "https://github.com/markocupic/contao-news-infinite-scroll-bundle"
+            "email": "m.cupic@gmx.ch",
+            "homepage": "https://github.com/markocupic/contao-news-infinite-scroll-bundle",
+            "role": "Developer"
         }
     ],
+    "support": {
+        "issues": "https://github.com/markocupic/contao-news-infinite-scroll-bundle/issues",
+        "source": "https://github.com/markocupic/contao-news-infinite-scroll-bundle"
+    },
     "require": {
-        "php": "^8.1",
-        "contao/core-bundle": "^4.13 || ^5.0",
-        "contao/news-bundle": "^4.13 || ^5.0"
+        "php": "^8.2",
+        "contao/core-bundle": "^5.3 || ^6.0",
+        "contao/news-bundle": "^5.3 || ^6.0",
+        "symfony/config": "^6.4 || ^7.0 || ^8.0",
+        "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
+        "symfony/http-foundation": "^6.4 || ^7.0 || ^8.0",
+        "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+        "symfony/security-core": "^6.4 || ^7.0 || ^8.0",
+        "symfony/translation-contracts": "^3.0"
     },
     "require-dev": {
-        "symfony/webpack-encore-bundle": "^2.0",
-        "markocupic/easy-coding-standard": "^13.0"
+        "contao/manager-plugin": "^2.12",
+        "contao/test-case": "^5.3 || ^6.0"
+    },
+    "conflict": {
+        "contao/manager-plugin": "<2.0 || >=3.0"
     },
     "autoload": {
         "psr-4": {
             "Markocupic\\ContaoNewsInfiniteScrollBundle\\": "src/"
-        },
-        "classmap": [
-            "contao/"
-        ],
-        "exclude-from-classmap": [
-            "contao/config/",
-            "contao/dca/",
-            "contao/languages/",
-            "contao/templates/"
-        ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Markocupic\\ContaoNewsInfiniteScrollBundle\\Tests\\": "tests/"
+        }
     },
     "extra": {
         "contao-manager-plugin": "Markocupic\\ContaoNewsInfiniteScrollBundle\\ContaoManager\\Plugin"
+    },
+    "config": {
+        "allow-plugins": {
+            "contao-components/installer": false,
+            "contao/manager-plugin": false,
+            "php-http/discovery": false,
+            "contao-community-alliance/composer-plugin": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "cs-fixer": "@php tools/ecs/vendor/bin/ecs check --config tools/ecs/config/default.php --fix --ansi",
+        "cs-check": "@php tools/ecs/vendor/bin/ecs check --config tools/ecs/config/default.php --ansi",
+        "unit-tests": "@php vendor/bin/phpunit --colors=always"
     }
 }

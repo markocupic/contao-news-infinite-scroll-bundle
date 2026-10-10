@@ -20,6 +20,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Contao\Message;
 use Contao\ModuleModel;
+use Markocupic\ContaoNewsInfiniteScrollBundle\Module\ModuleNewslistInfiniteScroll;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -41,7 +42,7 @@ class Module
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($_POST || 'edit' !== $request->query->get('act')) {
+        if (null === $request || $request->isMethod('POST') || 'edit' !== $request->query->get('act')) {
             return;
         }
 
@@ -56,13 +57,13 @@ class Module
             return;
         }
 
-        if (null === ($objModule = ModuleModel::findById($dc->id))) {
+        if (!$dc->id || null === ($objModule = ModuleModel::findById($dc->id))) {
             return;
         }
 
-        if ('newslist_infinite_scroll' === $objModule->type) {
+        if (ModuleNewslistInfiniteScroll::TYPE === $objModule->type) {
             Message::addInfo(
-                $this->translator->trans('tl_module.includeContaoNewsInfiniteScrollTemplate', ['js_news_infinite_scroll'], 'contao_default'),
+                $this->translator->trans('tl_module.includeContaoNewsInfiniteScrollTemplate', ['js_news_infinite_scroll'], 'contao_tl_module'),
             );
         }
     }
@@ -73,11 +74,11 @@ class Module
     #[AsCallback(table: 'tl_module', target: 'config.onload')]
     public function addFieldsToPalette(DataContainer $dc): void
     {
-        if (null === ($objModule = ModuleModel::findById($dc->id))) {
+        if (!$dc->id || null === ($objModule = ModuleModel::findById($dc->id))) {
             return;
         }
 
-        if ('newslist_infinite_scroll' === $objModule->type) {
+        if (ModuleNewslistInfiniteScroll::TYPE === $objModule->type) {
             // Manipulate palettes
             PaletteManipulator::create()
                 ->addLegend('news_infinite_scroll_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
@@ -93,6 +94,6 @@ class Module
     #[AsCallback(table: 'tl_module', target: 'config.onload')]
     public function setPalette(): void
     {
-        $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist_infinite_scroll'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'];
+        $GLOBALS['TL_DCA']['tl_module']['palettes'][ModuleNewslistInfiniteScroll::TYPE] = $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'] ?? '';
     }
 }

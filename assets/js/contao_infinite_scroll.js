@@ -28,18 +28,22 @@ ContaoInfiniteScroll.Defaults = DEFAULT_CONFIG;
 
 ContaoInfiniteScroll.Utils = {
 
-    LEADING_SLASH_PATTERN: /^\//,
-
     /**
-     * Normalizes a relative href to an absolute URL
+     * Resolves a (relative) href against the document base url.
+     * Works with and without a <base> tag and with absolute, root-relative,
+     * path-relative and query-only hrefs (e.g. "?page_n12=2").
+     *
      * @param {string|null} href - The href attribute value
-     * @returns {string|null} Normalized absolute URL or null
+     * @returns {string|null} Absolute URL or null
      */
     normalizeUrl: function (href) {
         if (!href) return null;
 
-        const normalized = href.replace(this.LEADING_SLASH_PATTERN, "");
-        return window.location.origin + '/' + normalized;
+        try {
+            return new URL(href, document.baseURI).href;
+        } catch (e) {
+            return null;
+        }
     },
 
     /**
